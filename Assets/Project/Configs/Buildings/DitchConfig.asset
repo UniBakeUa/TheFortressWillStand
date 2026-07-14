@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11722272baffe424aab28a9b938d3cdf, type: 3}
+  m_Name: DitchConfig
+  m_EditorClassIdentifier: 
+  <StructureName>k__BackingField: Ditch
+  <Id>k__BackingField: 3
+  <BaseCost>k__BackingField: 8
+  <BaseHP>k__BackingField: 120
+  <BaseErosionRate>k__BackingField: 55
+  <Prefab>k__BackingField: {fileID: 5377761115089344857, guid: 621f51584b56edd48b0f59567583659e, type: 3}
+  <GhostPrefab>k__BackingField: {fileID: 5181094371937380232, guid: 641167712dc43014ba4c9349a7216b03, type: 3}
+  <DamageReductionPerWall>k__BackingField: 0.2
+  <WallConfig>k__BackingField: {fileID: 11400000, guid: ff9c2a5e443d23b4dacf319f34cc649f, type: 2}
