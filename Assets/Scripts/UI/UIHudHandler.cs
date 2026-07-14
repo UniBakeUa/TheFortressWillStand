@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using UnityEngine;
 
@@ -5,20 +6,26 @@ namespace UI
 {
     public class UIHudHandler : MonoBehaviour
     {
-        [SerializeField] Animator animator;
+        [SerializeField] private float _showPosition = 225f;
+        [SerializeField] private float _hidePosition = -650f;
 
         private void Start()
         {
-            animator.SetBool("Building",true);
             GameStateManager.Instance.OnStateChange += ToggleAnimation;
         }
 
         private void ToggleAnimation(GameState state)
         {
             if(state == GameState.Building)
-                animator.SetBool("Building",true);
+                transform.DOLocalMoveY(_showPosition, 0.5f);
             else
-                animator.SetBool("Building",false);
+                transform.DOLocalMoveY(_hidePosition, 0.5f);
+        }
+
+        private void OnDestroy()
+        {
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChange -= ToggleAnimation;
         }
     }
 }

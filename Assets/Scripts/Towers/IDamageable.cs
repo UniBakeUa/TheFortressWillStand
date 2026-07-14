@@ -7,8 +7,6 @@ namespace Towers
     /// </summary>
     public interface IDamageable
     {
-        float CurrentHP { get; }
-        float MaxHP { get; }
         float ExposureFraction { get; }
 
         void TakeDamage(float amount);

@@ -132,6 +132,39 @@ namespace Waves
             _waveCoroutine = StartCoroutine(TsunamiSequence());
         }
 
+        public bool TryGetRandomFloodedPosition(out Vector3 result)
+        {
+            result = Vector2.zero;
+
+            for (int attempts = 0; attempts < 20; attempts++)
+            {
+                int x = UnityEngine.Random.Range(0, width);
+                int y = UnityEngine.Random.Range(0, height);
+                int i = Idx(x, y);
+
+                // Перевіряємо, чи немає тут стіни/вежі і чи рівень води вище мінімального
+                if (!_solid[i] && _bufA[i] > 0.1f)
+                {
+                    result = GridToWorld(x, y);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool IsFlooded(Vector2 worldPos)
+        {
+            WorldToGrid(worldPos, out int gx, out int gy);
+
+            // Якщо точка за межами сітки — води там точно немає
+            if (!InBounds(gx, gy)) return false;
+
+            int i = Idx(gx, gy);
+            // Перевіряємо, чи немає там перешкоди і чи рівень води достатній
+            return !_solid[i] && _bufA[i] > 0.1f;
+        }
+
         private IEnumerator TsunamiSequence()
         {
             // 1. Прилив (Rising)

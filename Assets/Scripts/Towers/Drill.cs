@@ -1,13 +1,24 @@
 using System.Collections;
 using UnityEngine;
 using Money;
+using Towers.UI;
+using UI;
+using UI.Factories;
 
 namespace Towers
 {
     public class Drill : Solid, IIncomeProducer
     {
+        [Header("Income Settings")]
         [SerializeField] float moneyPerTick = 1f;
         [SerializeField] float tickInterval = 5f;
+
+        [Header("Visual Settings")]
+        [SerializeField] private FloatingTextView _floatingTextPrefab;
+        [SerializeField] private Transform _textContainer;
+
+        private FloatingTextFactory _floatingTextFactory;
+        private DrillView _drillView;
 
         public float IncomePerTick => moneyPerTick;
         public float TickInterval => tickInterval;
@@ -22,11 +33,14 @@ namespace Towers
         {
             base.Start(); // критично: тут IsReady=true і RegisterFootprint()
 
+            _floatingTextFactory = new FloatingTextFactory(_floatingTextPrefab, _textContainer);
+            _drillView = _buildingView as DrillView;
+            _drillView.SetupTimer(tickInterval);
             _moneyManager = MoneyManager.Instance;
             PlaySpawnAnimation();
         }
 
-        void Update()
+        private void Update()
         {
             if (GameStateManager.Instance.CurrentState != GameState.Playing) return;
 
@@ -36,30 +50,14 @@ namespace Towers
                 ProduceMoney();
                 _incomeTimer = 0f;
             }
+
+            _drillView.UpdateMoneyTimer(_incomeTimer);
         }
 
-        void ProduceMoney()
+        private void ProduceMoney()
         {
+            _floatingTextFactory.SpawnText((int)moneyPerTick, transform.position + Vector3.up * 1.5f);
             _moneyManager.AddMoney((int)moneyPerTick);
-        }
-
-        public void PlaySpawnAnimation(float duration = 0.5f)
-        {
-            StartCoroutine(SpawnRoutine(duration));
-        }
-
-        IEnumerator SpawnRoutine(float duration)
-        {
-            transform.localScale = Vector3.zero;
-            float timer = 0;
-            while (timer < duration)
-            {
-                timer += Time.deltaTime;
-                float s = Mathf.SmoothStep(0f, 1f, timer / duration);
-                transform.localScale = new Vector3(s, s, 1);
-                yield return null;
-            }
-            transform.localScale = Vector3.one;
         }
 
         public override void Collapse()

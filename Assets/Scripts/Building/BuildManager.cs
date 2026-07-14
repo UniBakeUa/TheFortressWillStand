@@ -20,6 +20,7 @@ namespace Building
         public static BuildManager Instance { get; private set; }
         [SerializeField] List<StructureData> structureLibrary;
         [SerializeField] private int wallCost;
+        [SerializeField] private LineRenderer _lineRenderer;
 
         [SerializeField] GameObject wallGhostPrefab;
         [SerializeField] GameObject wallPrefab;
@@ -27,11 +28,14 @@ namespace Building
         [SerializeField] WallStrengthCalculator strengthCalc;
 
         [Header("Налаштування")]
-        [SerializeField] float minBuildX = -10f;
-        [SerializeField] float maxBuildX = 10f;
+        [SerializeField] private float snapRadius = 2f;
+        [SerializeField] private float minBuildX = -10f;
+        [SerializeField] private float maxBuildX = 10f;
+        [SerializeField] private float minBuildY = -10f;
+        [SerializeField] private float maxBuildY = 10f;
         [SerializeField] Color allowedGhostColor = Color.white;
         [SerializeField] Color forbiddenGhostColor = new Color(1f, 0.3f, 0.3f, 0.6f);
-[SerializeField] private LayerMask wallmask;
+        [SerializeField] private LayerMask wallmask;
         private int _currentSelectionId = 0;
         private GameObject _towerGhost;
         private GameObject _wallGhost;
@@ -40,6 +44,7 @@ namespace Building
         private IWallConnectable _firstSelectedTower;
         private MoneyManager _moneyManager;
         private bool _isRepairMode = false;
+        private Rect _buildZone;
 
         public void SetRepairMode(bool active)
         {
@@ -55,10 +60,13 @@ namespace Building
 
         void Start()
         {
+            DrawZone();
             UpdateSelectionPrefabs();
             _wallGhost = Instantiate(wallGhostPrefab,transform);
             _wallGhost.SetActive(false);
             _wallGhostLR = _wallGhost.GetComponent<LineRenderer>();
+
+            _buildZone = new Rect(minBuildX, minBuildY, maxBuildX - minBuildX, maxBuildY - minBuildY);
 
             _moneyManager = MoneyManager.Instance;
             GameStateManager.Instance.OnStateChange += ToggleBuildMode;
@@ -78,6 +86,17 @@ namespace Building
 
             _currentSelectionId = id;
             UpdateSelectionPrefabs();
+        }
+
+        private void DrawZone()
+        {
+            Vector3[] corners = new Vector3[4];
+            corners[0] = new Vector2(minBuildX, minBuildY);
+            corners[1] = new Vector2(maxBuildX, minBuildY);
+            corners[2] = new Vector2(maxBuildX, maxBuildY);
+            corners[3] = new Vector2(minBuildX, maxBuildY);
+
+            _lineRenderer.SetPositions(corners);
         }
 
         private void UpdateSelectionPrefabs()
@@ -128,7 +147,7 @@ namespace Building
             if (_moneyManager.GetMoney() >= repairCost)
             {
                 _moneyManager.SpendMoney(repairCost);
-                target.CurrentHP = target.MaxHP; // Повний ремонт
+                target.Model.CurrentHP = target.Model.MaxHP; // Повний ремонт
                 Debug.Log("Відремонтовано!");
             }
             else
@@ -149,34 +168,52 @@ namespace Building
             var data = structureLibrary.Find(s => s.id == id);
             return data.id == id ? data.cost : 100; // 100 як дефолтне значення
         }
+
         private void HandleClick(Vector2 pos)
         {
             if (_moneyManager == null) _moneyManager = MoneyManager.Instance;
 
             bool isShiftPressed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-            IWallConnectable clickedTower = GetTowerAt(pos);
+
+            // 1. Спочатку перевіряємо, чи ми не примагнітились до існуючої вежі
+            Transform snappedTowerTransform = GetNearbyMatchingTower(pos, snapRadius);
+            IWallConnectable clickedTower = null;
+
+            if (snappedTowerTransform != null)
+            {
+                // Якщо примагнітились, підміняємо ціль на цю вежу
+                clickedTower = snappedTowerTransform.GetComponent<IWallConnectable>();
+            }
+            else
+            {
+                // Якщо поруч нічого немає, шукаємо стандартним способом під курсором
+                clickedTower = GetTowerAt(pos);
+            }
+
+            // 2. Логіка ремонту
             if (_isRepairMode)
             {
-                IWallConnectable clicked = GetTowerAt(pos);
-                // Ремонтуємо, тільки якщо це Solid і він пошкоджений
-                if (clicked is Solid solid && solid.CurrentHP < solid.MaxHP)
+                // Для ремонту можна залишити точний клік, або теж використовувати магніт
+                IWallConnectable clickedForRepair = GetTowerAt(pos);
+                if (clickedForRepair is Solid solid && solid.Model.CurrentHP < solid.Model.MaxHP)
                 {
                     RepairStructure(solid);
                 }
                 return;
             }
+
+            // 3. Сценарій: Початок будівництва (обрання першої вежі)
             if (_firstSelectedTower == null)
             {
                 if (clickedTower != null)
                 {
-                    // Якщо зараз обрано НЕ веже-подібну структуру (наприклад Drill) -
-                    // клік по існуючій вежі ігнорується повністю, wall-drag не починається
                     if (IsCurrentSelectionWallConnectable())
                     {
                         _firstSelectedTower = clickedTower;
                     }
                     return;
                 }
+
                 if (!IsWithinBuildableZone(pos)) return;
 
                 if (IsOccupied(pos))
@@ -191,12 +228,13 @@ namespace Building
                     _moneyManager.ShowNotEnoughPopup();
                     return;
                 }
-                _moneyManager.SpendMoney(cost);
 
+                _moneyManager.SpendMoney(cost);
                 _firstSelectedTower = CreateStructure(pos);
                 return;
             }
 
+            // 4. Сценарій: Будуємо стіну до ІСНУЮЧОЇ вежі (сюди ми потрапляємо завдяки магніту)
             if (clickedTower != null && clickedTower != _firstSelectedTower)
             {
                 BuildWall(_firstSelectedTower, clickedTower);
@@ -204,7 +242,7 @@ namespace Building
                 return;
             }
 
-            // Сценарій 3: Клік на порожнє місце - будуємо вежу і стіну
+            // 5. Сценарій: Клік на порожнє місце - будуємо НОВУ вежу і стіну
             if (clickedTower == null && IsWithinBuildableZone(pos))
             {
                 if (IsOccupied(pos))
@@ -212,6 +250,7 @@ namespace Building
                     Debug.Log("Тут не можна будувати: місце зайняте!");
                     return;
                 }
+
                 int towerCost = GetCurrentStructureCost(_currentSelectionId);
 
                 if (_moneyManager.GetMoney() >= (towerCost + wallCost))
@@ -243,6 +282,31 @@ namespace Building
                 if (hit.GetComponentInParent<IDamageable>() != null) return true;
             }
             return false;
+        }
+
+        private Transform GetNearbyMatchingTower(Vector2 pos, float radius)
+        {
+            Collider2D[] hits = Physics2D.OverlapCircleAll(pos, radius);
+            Transform closestMatch = null;
+            float minDistance = float.MaxValue;
+
+            foreach (var hit in hits)
+            {
+                // Шукаємо компонент, що містить StructureId
+                Solid solid = hit.GetComponentInParent<Solid>();
+
+                // Перевіряємо, чи це та сама структура, яку ми зараз обрали
+                if (solid != null && solid.StructureId == _currentSelectionId && solid.IsSlipable)
+                {
+                    float dist = Vector2.Distance(pos, solid.transform.position);
+                    if (dist < minDistance)
+                    {
+                        minDistance = dist;
+                        closestMatch = solid.transform;
+                    }
+                }
+            }
+            return closestMatch;
         }
 
         public void DeselectStructure()
@@ -302,19 +366,31 @@ namespace Building
 
         private void UpdateGhosts(Vector2 mousePos)
         {
-            bool canBuild = IsWithinBuildableZone(mousePos) && !IsOccupied(mousePos);
+            Transform snappedTower = GetNearbyMatchingTower(mousePos, snapRadius);
+            bool isSnapped = snappedTower != null;
 
-            // Перевірка перетину стін для госта
+            Vector2 ghostPos = isSnapped ? (Vector2)snappedTower.position : mousePos;
+
+            bool canBuild;
+            if (isSnapped)
+            {
+                canBuild = true;
+            }
+            else
+            {
+                canBuild = IsWithinBuildableZone(ghostPos) && !IsOccupied(ghostPos);
+            }
+
             if (_wallGhost.activeSelf && _firstSelectedTower != null)
             {
-                if (IsWallIntersecting(_firstSelectedTower.Transform.position, mousePos))
+                if (IsWallIntersecting(_firstSelectedTower.Transform.position, ghostPos))
                     canBuild = false;
             }
 
             if (_towerGhost != null)
             {
                 _towerGhost.SetActive(_currentSelectionId >= 0);
-                _towerGhost.transform.position = mousePos;
+                _towerGhost.transform.position = ghostPos;
             }
 
             if (_wallGhost != null)
@@ -323,7 +399,7 @@ namespace Building
                 {
                     _wallGhost.SetActive(true);
                     _wallGhostLR.SetPosition(0, _firstSelectedTower.Transform.position);
-                    _wallGhostLR.SetPosition(1, mousePos);
+                    _wallGhostLR.SetPosition(1, ghostPos);
                     TintGhost(_towerGhost, _wallGhost, canBuild);
                 }
                 else
@@ -372,7 +448,7 @@ namespace Building
             }
         }
 
-        bool IsWithinBuildableZone(Vector2 pos) => pos.x >= minBuildX && pos.x <= maxBuildX;
+        bool IsWithinBuildableZone(Vector2 pos) => _buildZone.Contains(pos);
 
         // Drill (і будь-яка інша не-веже-подібна структура) не реалізує IWallConnectable -
         // тому клік по існуючій вежі не повинен починати wall-drag, якщо зараз обрано таке

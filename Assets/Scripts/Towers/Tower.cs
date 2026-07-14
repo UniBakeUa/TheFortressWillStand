@@ -45,25 +45,6 @@ namespace Towers
             base.Collapse();
         }
 
-        public void PlaySpawnAnimation(float duration = 0.5f)
-        {
-            StartCoroutine(SpawnRoutine(duration));
-        }
-
-        IEnumerator SpawnRoutine(float duration)
-        {
-            transform.localScale = Vector3.zero;
-            float timer = 0;
-            while (timer < duration)
-            {
-                timer += Time.deltaTime;
-                float s = Mathf.SmoothStep(0f, 1f, timer / duration);
-                transform.localScale = new Vector3(s, s, 1);
-                yield return null;
-            }
-            transform.localScale = Vector3.one;
-        }
-
         // Легко додати новий тип вежі: успадкуй Tower (або Solid + IWallConnectable напряму)
         // і перевизнач ErosionRate/іншу віртуальну логіку зі своєю формулою -
         // BuildManager і Wall працюватимуть з ним без жодних змін, бо спілкуються через IWallConnectable

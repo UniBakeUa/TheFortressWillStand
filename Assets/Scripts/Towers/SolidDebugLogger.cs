@@ -13,6 +13,6 @@ public class SolidDebugLogger : MonoBehaviour
         _timer += Time.deltaTime;
         if (_timer < 1f) return;
         _timer = 0f;
-        Debug.Log($"{name}: HP={_solid.CurrentHP:F1}, Exposure={_solid.ExposureFraction:F2}");
+        Debug.Log($"{name}: HP={_solid.Model.CurrentHP:F1}, Exposure={_solid.ExposureFraction:F2}");
     }
 }

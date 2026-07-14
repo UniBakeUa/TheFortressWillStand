@@ -40,7 +40,7 @@ namespace Towers
             if (show)
             {
                 // Оновлюємо текст КОПІЇ
-                _hpText.text = $"{Mathf.CeilToInt(_solid.CurrentHP)} / {Mathf.CeilToInt(_solid.MaxHP)}";
+                _hpText.text = $"{Mathf.CeilToInt(_solid.Model.CurrentHP)} / {Mathf.CeilToInt(_solid.Model.MaxHP)}";
             }
         }
     }
