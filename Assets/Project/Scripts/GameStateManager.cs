@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-    public enum GameState { Playing, Building }
+    public enum GameState { Playing, Building, Paused }
 
     public class GameStateManager : MonoBehaviour
     {
@@ -11,7 +11,7 @@ using UnityEngine;
         void Awake()
         {
             Instance = this;
-            CurrentState = GameState.Building;
+            CurrentState = GameState.Paused;
         }
 
 

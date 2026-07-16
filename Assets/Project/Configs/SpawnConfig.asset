@@ -33,3 +33,8 @@ MonoBehaviour:
     <SpawnChance>k__BackingField: 5
     <SpawnInterval>k__BackingField: 5
     <Prefab>k__BackingField: {fileID: -6911145471791022444, guid: a62f667b1167d7a4c8d0e0abe4f0859b, type: 3}
+  - <ItemType>k__BackingField: 4
+    <StartingWave>k__BackingField: 1
+    <SpawnChance>k__BackingField: 15
+    <SpawnInterval>k__BackingField: 1
+    <Prefab>k__BackingField: {fileID: -5301170254801526072, guid: 89ca1837a12dbbf439fd6c9537b8c64d, type: 3}

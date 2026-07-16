@@ -60,7 +60,11 @@ namespace Managers
                 if (_totalSequencesPlayed % extraWavesEveryXStages == 0)
                 {
                     Debug.Log($"БОНУС: Додаткова хвиля через кожні {extraWavesEveryXStages} циклів!");
+                    
                     _currentStage += 1;
+                    UpdateDifficulty(_currentStage);
+
+                    Debug.Log("Current stage - " + _currentStage);
                 }
 
                 // 2. Розраховуємо загальний час стадії для UI
@@ -86,16 +90,14 @@ namespace Managers
                     yield return null;
                 }
 
+                Debug.Log("go to building");
+
                 // 5. Завершення стадії - перехід в Building
                 GameStateManager.Instance.ChangeState(GameState.Building);
                 _waveTimerView.HideTimer();
 
                 // Чекаємо, поки гравець завершить будівництво
                 yield return new WaitUntil(() => GameStateManager.Instance.CurrentState == GameState.Playing);
-
-                // 6. Оновлюємо складність
-                _currentStage = GetNextFibonacci(_currentStage);
-                yield return new WaitForSeconds(delayBetweenStages);
             }
         }
 
@@ -122,12 +124,20 @@ namespace Managers
             onComplete?.Invoke();
         }
 
-        int GetNextFibonacci(int current)
+        private void UpdateDifficulty(int currentStage)
         {
-            if (current == 1) return 2;
-            if (current == 2) return 3;
-            if (current == 3) return 5;
-            return current + 3;
+            waterGrid.SetWaveIntensity(currentStage * 0.1f);
+
+
+            if (waterGrid.waveSpeedSq <= 0.48f)
+                waterGrid.waveSpeedSq += 0.01f;
+
+            if (waterGrid.flowX <= 0.2f)
+                waterGrid.flowX += 0.005f;
+
+            if (waterGrid.dampRising <= 0.95f)
+                waterGrid.dampRising += 0.005f;
+
         }
     }
 }

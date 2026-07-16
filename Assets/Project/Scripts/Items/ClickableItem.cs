@@ -8,20 +8,38 @@ namespace Items
     {
         [SerializeField] protected int moneyValue = 10;
 
-        protected Action<ClickableItem> _onItemClicked;
+        protected Action<ClickableItem> _onItemFinished;
 
         public void Init(Action<ClickableItem> returnAction)
         {
-            _onItemClicked = returnAction;
+            _onItemFinished = returnAction;
+        }
+
+        protected void GiveReward()
+        {
+            if (GameStateManager.Instance.CurrentState != GameState.Playing)
+                return;
+
+            MoneyManager.Instance.AddMoney(moneyValue);
         }
 
         protected virtual void OnMouseDown()
         {
-            if (GameStateManager.Instance.CurrentState != GameState.Playing) return;
+            if (GameStateManager.Instance.CurrentState != GameState.Playing)
+                return;
 
+            Collect();
+        }
+
+        protected virtual void Collect()
+        {
             MoneyManager.Instance.AddMoney(moneyValue);
+            Finish();
+        }
 
-            _onItemClicked?.Invoke(this);
+        protected void Finish()
+        {
+            _onItemFinished?.Invoke(this);
         }
     }
 }

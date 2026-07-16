@@ -14,7 +14,7 @@ TagManager:
   - UI
   - Tower
   - Wall
-  - 
+  - MenuUI
   - 
   - 
   - 
@@ -53,6 +53,9 @@ TagManager:
     locked: 0
   - name: Items
     uniqueID: 1696785359
+    locked: 0
+  - name: MenuUI
+    uniqueID: 2068589431
     locked: 0
   m_RenderingLayers:
   - Default

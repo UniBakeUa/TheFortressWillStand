@@ -5,6 +5,7 @@
         PONCHIC,
         Shell,
         Jellyfish,
-        Cheliks
+        Cheliks,
+        Airplane
     }
 }

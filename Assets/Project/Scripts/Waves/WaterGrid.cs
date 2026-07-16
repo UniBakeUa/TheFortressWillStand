@@ -17,14 +17,14 @@ namespace Waves
         float _debugTimer;
 
         [Header("Потік")]
-        [SerializeField] float flowX = 0.05f;
+        [SerializeField] public float flowX = 0.05f;
 
         [Header("Налаштування хвилі")]
         [SerializeField] float defaultWaterLevel = 0.4f;
         [SerializeField] float waveTargetLevel = 0.6f;
         [Header("Динамічний Damping")]
         [SerializeField] float dampNormal = 0.95f;
-        [SerializeField] float dampRising = 0.86f;
+        [SerializeField] public float dampRising = 0.86f;
         [SerializeField] float dampFalling = 0.5f;
 
         [Header("Таймінги")]
@@ -252,7 +252,7 @@ namespace Waves
             Step();
         }
 
-        [SerializeField, Range(0.05f, 0.49f)] float waveSpeedSq = 0.4f;
+        [SerializeField, Range(0.05f, 0.49f)] public float waveSpeedSq = 0.4f;
 
         void Step()
         {

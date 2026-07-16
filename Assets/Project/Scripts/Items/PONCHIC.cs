@@ -31,7 +31,7 @@ namespace Items
             _timer += Time.deltaTime;
             if (_timer >= 5f)
             {
-                _onItemClicked?.Invoke(this);
+                _onItemFinished?.Invoke(this);
             }
         }
     }

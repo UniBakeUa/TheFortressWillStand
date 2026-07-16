@@ -1,7 +1,9 @@
+using System;
 using Towers.Buildings;
 using Towers.Models;
 using Towers.ScriptableObjects;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Towers
 {
@@ -10,6 +12,8 @@ namespace Towers
     {
         [Header("Налаштування фортеці")]
         [SerializeField] private FortressConfig _fortressConfig;
+
+        public static Action _onFortressCollapsed;
 
         private void Start()
         {
@@ -33,7 +37,10 @@ namespace Towers
         public override void Collapse()
         {
             Debug.Log("Fortress зруйновано водою!");
-            base.Collapse();
+
+            GameStateManager.Instance.ChangeState(GameState.Paused);
+            EndMenu.Instance.Show();
+            
         }
     }
 }

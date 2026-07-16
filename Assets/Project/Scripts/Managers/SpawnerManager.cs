@@ -24,6 +24,7 @@ namespace Managers
 
         private void Awake()
         {
+            _spawners.Add(SpawnableItemType.Airplane, new AirplaneSpawner(_spawnConfig.GetPrefab<Airplane>(SpawnableItemType.Airplane), _itemContainer));
             _spawners.Add(SpawnableItemType.PONCHIC, new ScreenBottomSpawner(_spawnConfig.GetPrefab<PONCHIC>(SpawnableItemType.PONCHIC), _itemContainer));
             _spawners.Add(SpawnableItemType.Shell, new WaterShellSpawner(_spawnConfig.GetPrefab<Shell>(SpawnableItemType.Shell), _itemContainer, _waterGrid, _shellSpawnZone));
             _spawners.Add(SpawnableItemType.Cheliks, new CheliksSpawner(_spawnConfig.GetPrefab<Cheliks>(SpawnableItemType.Cheliks), _itemContainer, _waterGrid, _shellSpawnZone));

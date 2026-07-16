@@ -45,7 +45,7 @@ namespace Items
                 MoneyManager.Instance.SpendMoney(moneyValue);
                 _floatingTextFactory.SpawnText((int)-moneyValue, transform.position + Vector3.up * 1.5f);
                 transform.DOKill();
-                _onItemClicked?.Invoke(this);
+                _onItemFinished?.Invoke(this);
             }
             else
             {
@@ -66,7 +66,7 @@ namespace Items
         public void Collapse()
         {
             transform.DOKill();
-            _onItemClicked?.Invoke(this);
+            _onItemFinished?.Invoke(this);
         }
     }
 }
