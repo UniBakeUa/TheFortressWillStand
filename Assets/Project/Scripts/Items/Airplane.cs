@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Managers;
+using System.Collections;
 
 namespace Items
 {
@@ -17,6 +18,7 @@ namespace Items
         [SerializeField] private AudioClip[] voiceLines;
 
         private Rigidbody2D rb;
+        private Camera _camera;
 
         private Vector2 direction;
 
@@ -25,6 +27,7 @@ namespace Items
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
+            _camera = Camera.main;
         }
 
         private void OnEnable()
@@ -36,6 +39,7 @@ namespace Items
             rb.angularVelocity = 0;
 
             rb.bodyType = RigidbodyType2D.Kinematic;
+            StartCoroutine(ReturnInPoolIfNotVisible());
         }
 
         public void StartFlight(Vector2 _direction)
@@ -44,6 +48,7 @@ namespace Items
             
             transform.up = direction;
         }
+
 
         private void Update()
         {
@@ -97,6 +102,24 @@ namespace Items
 
             int x = Random.Range(0, voiceLines.Length);
             AudioSource.PlayClipAtPoint(voiceLines[x], transform.position);
+        }
+
+        private IEnumerator ReturnInPoolIfNotVisible()
+        {
+            yield return new WaitForSeconds(1f);
+            yield return new WaitUntil(() => !IsInCameraRange(_camera));
+            yield return new WaitForSeconds(1f);
+            Finish();
+        }
+
+        private bool IsInCameraRange(Camera camera)
+        {
+            Vector3 viewportPos = camera.WorldToViewportPoint(transform.position);
+
+            return viewportPos.x >= 0 && viewportPos.x <= 1 &&
+                   viewportPos.y >= 0 && viewportPos.y <= 1 &&
+                   viewportPos.z > 0;
+
         }
     }
 }

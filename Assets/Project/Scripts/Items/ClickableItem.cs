@@ -29,6 +29,7 @@ namespace Items
                 return;
 
             Collect();
+            Debug.Log("Collected");
         }
 
         protected virtual void Collect()

@@ -1,3 +1,5 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using Towers;
 using Towers.Buildings;
 using Towers.Data;
@@ -19,17 +21,14 @@ namespace Managers
 
         [Header("Налаштування будівництва")]
         [SerializeField] private LineRenderer _lineRenderer;
-        [SerializeField] private float snapRadius = 2f;
-        [SerializeField] private float minBuildX = -10f;
-        [SerializeField] private float maxBuildX = 10f;
-        [SerializeField] private float minBuildY = -10f;
-        [SerializeField] private float maxBuildY = 10f;
+        [SerializeField] private List<BuildingAreaConfig> _buildingAreaConfigList;
         [SerializeField] private Color allowedGhostColor = Color.white;
         [SerializeField] private Color forbiddenGhostColor = new Color(1f, 0.3f, 0.3f, 0.6f);
         [SerializeField] private LayerMask wallmask;
 
         private int _currentSelectionId = -1;
         private BuildingConfig _currentConfig;
+        private BuildingAreaConfig _buildingAreaConfig;
 
         private GameObject _towerGhost;
         private GameObject _wallGhost;
@@ -47,9 +46,14 @@ namespace Managers
 
         private void Start()
         {
+            InitBuildingArea(_buildingAreaConfigList[0]);
             DrawZone();
 
-            _buildZone = new Rect(minBuildX, minBuildY, maxBuildX - minBuildX, maxBuildY - minBuildY);
+            _buildZone = new Rect(
+                _buildingAreaConfig.MinBuildX, _buildingAreaConfig.MinBuildY, 
+                _buildingAreaConfig.MaxBuildX - _buildingAreaConfig.MinBuildX,
+                _buildingAreaConfig.MaxBuildY - _buildingAreaConfig.MinBuildY);
+
             _moneyManager = MoneyManager.Instance;
 
             if (GameStateManager.Instance != null)
@@ -87,10 +91,10 @@ namespace Managers
         private void DrawZone()
         {
             Vector3[] corners = new Vector3[4];
-            corners[0] = new Vector2(minBuildX, minBuildY);
-            corners[1] = new Vector2(maxBuildX, minBuildY);
-            corners[2] = new Vector2(maxBuildX, maxBuildY);
-            corners[3] = new Vector2(minBuildX, maxBuildY);
+            corners[0] = new Vector2(_buildingAreaConfig.MinBuildX, _buildingAreaConfig.MinBuildY);
+            corners[1] = new Vector2(_buildingAreaConfig.MaxBuildX, _buildingAreaConfig.MinBuildY);
+            corners[2] = new Vector2(_buildingAreaConfig.MaxBuildX, _buildingAreaConfig.MaxBuildY);
+            corners[3] = new Vector2(_buildingAreaConfig.MinBuildX, _buildingAreaConfig.MaxBuildY);
 
             _lineRenderer.SetPositions(corners);
         }
@@ -145,6 +149,11 @@ namespace Managers
             if (Input.GetMouseButtonDown(0)) HandleClick(mousePos);
         }
 
+        private void InitBuildingArea(BuildingAreaConfig config)
+        {
+            _buildingAreaConfig = config;
+        }
+
         private void RepairStructure(BaseBuilding target)
         {
             if (target is Fortress) return;
@@ -168,7 +177,7 @@ namespace Managers
         {
             bool isShiftPressed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
-            Transform snappedTowerTransform = GetNearbyMatchingTower(pos, snapRadius);
+            Transform snappedTowerTransform = GetNearbyMatchingTower(pos, _buildingAreaConfig.SnapRadius);
             ITower clickedTower = snappedTowerTransform != null ? snappedTowerTransform.GetComponent<ITower>() : GetTowerAt(pos);
 
             // 1. Ремонт
@@ -366,7 +375,7 @@ namespace Managers
                 _firstSelectedTower = null; // Скидаємо мертве посилання
             }
 
-            Transform snappedTower = GetNearbyMatchingTower(mousePos, snapRadius);
+            Transform snappedTower = GetNearbyMatchingTower(mousePos, _buildingAreaConfig.SnapRadius);
             bool isSnapped = snappedTower != null;
 
             Vector2 ghostPos = isSnapped ? (Vector2)snappedTower.position : mousePos;

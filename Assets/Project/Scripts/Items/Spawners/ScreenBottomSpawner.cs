@@ -6,6 +6,7 @@ namespace Items.Spawners
     {
         public ScreenBottomSpawner(PONCHIC prefab, Transform container) : base(prefab, container)
         {
+
         }
 
         protected override bool TryGetSpawnPosition(out Vector3 position)

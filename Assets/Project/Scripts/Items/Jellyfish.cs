@@ -36,13 +36,13 @@ namespace Items
 
         protected override void OnMouseDown()
         {
-            if (GameStateManager.Instance.CurrentState != GameState.Playing &&
+            base.OnMouseDown();
+            /*if (GameStateManager.Instance.CurrentState != GameState.Playing &&
                 GameStateManager.Instance.CurrentState != GameState.Building)
-                return;
+                return;*/
 
             if (MoneyManager.Instance.GetMoney() >= moneyValue)
             {
-                MoneyManager.Instance.SpendMoney(moneyValue);
                 _floatingTextFactory.SpawnText((int)-moneyValue, transform.position + Vector3.up * 1.5f);
                 transform.DOKill();
                 _onItemFinished?.Invoke(this);

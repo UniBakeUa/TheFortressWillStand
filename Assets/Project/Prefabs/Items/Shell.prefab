@@ -77,7 +77,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 6
   m_Sprite: {fileID: 21300000, guid: facaf55781d8486409db1562e7c46be4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -102,6 +102,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moneyValue: 10
+  _floatingTextPrefab: {fileID: 2352451390663585589, guid: a57451b113aaa7248be69a3b1cd643f0, type: 3}
 --- !u!58 &5694959199148000505
 CircleCollider2D:
   m_ObjectHideFlags: 0

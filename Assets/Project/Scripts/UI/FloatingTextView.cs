@@ -26,10 +26,10 @@ namespace UI
             color.a = 1f;
             _textMesh.color = color;
 
-            Animate();
+            Animate(onComplete);
         }
 
-        private void Animate()
+        private void Animate(Action<FloatingTextView> onCompleteAction)
         {
             Sequence sequence = DOTween.Sequence();
 
@@ -41,7 +41,7 @@ namespace UI
 
             sequence.OnComplete(() =>
             {
-                _onAnimationFinished?.Invoke(this);
+                onCompleteAction?.Invoke(this);
             });
         }
 

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1716ab1ffb8b2ef428fbcba630b8aa74, type: 3}
+  m_Name: BuildingArea_1
+  m_EditorClassIdentifier: 
+  SnapRadius: 0.5
+  MinBuildX: 3
+  MaxBuildX: 17
+  MinBuildY: 3
+  MaxBuildY: 14
+  Scale: {x: 24.6156, y: 17.3233}
+  Position: {x: 11.8078, y: 8.1616, z: 0}
+  Width: 200
+  Height: 128
+  Size: 6.43
