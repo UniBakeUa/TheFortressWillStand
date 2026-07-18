@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using Managers;
 using System.Collections;
+using Towers;
+using System.Collections.Generic;
+using static UnityEditor.Progress;
 
 namespace Items
 {
@@ -19,11 +22,18 @@ namespace Items
 
         private Rigidbody2D rb;
         private Camera _camera;
+        private Fortress _fortress;
 
         private Vector2 direction;
 
         private bool isCrashing;
+        private bool isBombDropped = false;
 
+        [Header("Explosion")]
+        [SerializeField] private GameObject _explosionPrefab;
+        [SerializeField] private float _epxlosionDamage;
+
+        private List<Airplane> _activeAirplaneslistReference;
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
@@ -33,6 +43,7 @@ namespace Items
         private void OnEnable()
         {
             isCrashing = false;
+            isBombDropped = false;
 
             rb.gravityScale = 0;
             rb.linearVelocity = Vector2.zero;
@@ -57,6 +68,8 @@ namespace Items
 
             transform.position +=
                 (Vector3)(direction * speed * Time.deltaTime);
+
+            CheckForDropBomb();
         }
 
         protected override void OnMouseDown()
@@ -67,12 +80,33 @@ namespace Items
             base.OnMouseDown();
         }
 
+        private void CheckForDropBomb()
+        {
+            if (Fortress != null && !isBombDropped && Vector3.Distance(transform.position, Fortress.transform.position) <= 0.05f)
+            {
+                CreateExplosionInTheFortress();
+            }
+        }
+
+        private void CreateExplosionInTheFortress()
+        {
+            isBombDropped = true;
+            Instantiate(_explosionPrefab, GetRandomPositionAround(Fortress.transform.position, 0.3f), Quaternion.identity);
+            _fortress.GetComponentInParent<IDamageable>().TakeDamage(_epxlosionDamage);
+        }
+        private Vector3 GetRandomPositionAround(Vector3 center, float radius)
+        {
+            Vector2 offset = Random.insideUnitCircle * radius; 
+            return center + new Vector3(offset.x, offset.y, 0f);
+        }
+
         protected override void Collect()
         {
             PlayFallingAudio();
 
             MoneyManager.Instance.AddMoney(moneyValue);
             StartFalling();
+            _activeAirplaneslistReference.Remove(this);
         }
 
         private void StartFalling()
@@ -91,6 +125,11 @@ namespace Items
             {
                 Finish();
             }
+        }
+
+        public void WasStricken()
+        {
+            Collect();
         }
 
         private void PlayFallingAudio()
@@ -120,6 +159,19 @@ namespace Items
                    viewportPos.y >= 0 && viewportPos.y <= 1 &&
                    viewportPos.z > 0;
 
+        }
+
+        public Fortress Fortress
+        {
+            get { return _fortress; }
+            set { _fortress = value; }
+        }
+
+        public List<Airplane> ActiveAirplaneslistReference
+        {
+            get { return _activeAirplaneslistReference; }
+            set { _activeAirplaneslistReference = value; }
+            
         }
     }
 }

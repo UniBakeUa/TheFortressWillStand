@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UI;
 using UnityEngine;
 using Waves;
@@ -7,6 +8,7 @@ namespace Managers
 {
     public class WaveManager : MonoBehaviour
     {
+        [SerializeField] private TextMeshProUGUI _waveLevelText;
         [SerializeField] private WaveTimerView _waveTimerView;
         [SerializeField] WaterGrid waterGrid;
         [SerializeField] float delayBetweenWaves = 2.0f;
@@ -48,6 +50,8 @@ namespace Managers
                     StopCoroutine(_waveCoroutine);
                     _waveCoroutine = null;
                 }
+                // Update UI to visualize current level wave
+                _waveLevelText.SetText("Wave: " + (CurrentLevel + 1));
             }
         }
 

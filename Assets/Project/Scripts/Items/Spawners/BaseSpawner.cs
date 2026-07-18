@@ -39,7 +39,6 @@ namespace Items.Spawners
         {
             T item = pool.Get();
             item.transform.position = position;
-
             item.Init(ReturnToPool);
 
             item.gameObject.SetActive(true);

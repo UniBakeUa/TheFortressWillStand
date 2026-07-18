@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Towers;
 using UnityEngine;
 
 namespace Items.Spawners
@@ -5,13 +7,18 @@ namespace Items.Spawners
     public class AirplaneSpawner : BaseSpawner<Airplane>
     {
         private Camera _camera;
-
+        private Fortress _fortress;
+        private List<Airplane> _activeAirplanes;
         public AirplaneSpawner(
             Airplane prefab,
-            Transform container)
+            Transform container,
+            Fortress fortress,
+            List<Airplane> activeAirplanes)
             : base(prefab, container)
         {
             _camera = Camera.main;
+            _fortress = fortress;
+            _activeAirplanes = activeAirplanes;
         }
 
         protected override bool TryGetSpawnPosition(
@@ -64,12 +71,16 @@ namespace Items.Spawners
         protected override void SetupSpawnedItem(
             Airplane item)
         {
-            Vector3 center =
+            /*Vector3 center =
                 _camera.ViewportToWorldPoint(
                     new Vector3(0.5f, 0.5f));
-
+*/
+            item.Fortress = _fortress;
+            item.ActiveAirplaneslistReference = _activeAirplanes;
+            _activeAirplanes.Add(item);
+            Vector3 fortressPos = _fortress.transform.position;
             Vector2 direction =
-                (center - item.transform.position)
+                (fortressPos - item.transform.position)
                 .normalized;
 
             item.StartFlight(direction);

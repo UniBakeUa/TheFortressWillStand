@@ -8,6 +8,7 @@ namespace Items.Spawners
     {
         private readonly WaterGrid _waterGrid;
         private readonly Collider2D _buildZone;
+        private readonly Jellyfish _prefab;
 
         private float _swimDuration = 2.0f;
 
@@ -15,6 +16,7 @@ namespace Items.Spawners
         {
             _waterGrid = waterGrid;
             _buildZone = buildZone;
+            _prefab = prefab;
         }
 
         protected override bool TryGetSpawnPosition(out Vector3 position)
@@ -50,6 +52,7 @@ namespace Items.Spawners
                 if (!isOccupied)
                 {
                     position = randomPoint;
+                    position.z = _prefab.transform.position.z;
                     return true;
                 }
             }

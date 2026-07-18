@@ -13,12 +13,14 @@ MonoBehaviour:
   m_Name: BuildingArea_2
   m_EditorClassIdentifier: 
   SnapRadius: 0.5
-  MinBuildX: 3
+  MinBuildX: -4
   MaxBuildX: 17
-  MinBuildY: 3
-  MaxBuildY: 14
-  Scale: {x: 24.6156, y: 17.3233}
-  Position: {x: 11.8078, y: 8.1616, z: 0}
-  Width: 200
-  Height: 128
-  Size: 6.43
+  MinBuildY: -2
+  MaxBuildY: 19
+  SandScale: {x: 48.65839, y: 30.4}
+  SandPosition: {x: 11.3722, y: 8.1616, z: 0}
+  GridWidth: 400
+  GridHeight: 225
+  GridOrigin: {x: -12, y: -5}
+  RisingTime: 5.5
+  CameraSize: 13

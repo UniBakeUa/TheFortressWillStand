@@ -92,6 +92,12 @@ namespace Towers.Buildings
             }
         }
 
+        protected override void OnGridRebuilt()
+        {
+            if (!IsReady || _nodeA == null || _nodeB == null) return;
+            WaterGrid.RegisterObstacleCapsule(_nodeA.Position, _nodeB.Position, WallModel.WallHalfWidth);
+        }
+
         public override void Collapse()
         {
             if (_nodeA?.Owner != null) _nodeA.Owner.RemoveWall(this);

@@ -11,14 +11,16 @@ public class BuildingAreaConfig : ScriptableObject
     public float MaxBuildY = 10f;
 
     [Header("Sand area")]
-    public Vector2 Scale;
-    public Vector3 Position;
+    public Vector2 SandScale;
+    public Vector3 SandPosition;
 
     [Header("Water Grid")]
-    public float Width;
-    public float Height;
+    public int GridWidth;
+    public int GridHeight;
+    public Vector2 GridOrigin;
+    public float RisingTime;
 
 
     [Header("Camera Options")]
-    public float Size;
+    public float CameraSize;
 }

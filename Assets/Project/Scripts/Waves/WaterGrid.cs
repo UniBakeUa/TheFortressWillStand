@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -46,10 +47,14 @@ namespace Waves
         Coroutine _waveCoroutine;
         int Idx(int x, int y) => y * width + x;
 
+        int _allocW, _allocH;
+
         [Header("Берег - лінія проходить точно через ці дві world-точки")]
         [SerializeField] float restLineWorldX = 5f;
         [SerializeField] float tsunamiLineWorldX = 3f;
-// Метод для динамічної зміни сили хвилі
+
+        public event Action OnGridRebuilt;
+        // Метод для динамічної зміни сили хвилі
         public void SetWaveIntensity(float intensity)
         {
             // intensity від 0 до 1
@@ -62,6 +67,57 @@ namespace Waves
 
             EnsureBuffersAllocated();
             GenerateNaturalTerrain();
+        }
+
+        public void RebuildWaterGrid(int newWidth, int newHeight, float newCellSize, Vector2 newOrigin)
+        {
+ 
+            if (_waveCoroutine != null)
+            {
+                StopCoroutine(_waveCoroutine);
+                _waveCoroutine = null;
+            }
+
+            width = newWidth;
+            height = newHeight;
+            cellSize = newCellSize;
+            origin = newOrigin;
+
+            AllocateBuffers(force: true);
+
+            GenerateNaturalTerrain();
+
+            if (_renderTex != null)
+            {
+                Destroy(_renderTex);
+                _renderTex = null;
+            }
+
+            _dynamicInjectedLevel = defaultWaterLevel;
+            _currentDamping = dampNormal;
+
+            OnGridRebuilt?.Invoke();
+
+            // _solid обнуляється разом з AllocateBuffers - якщо у вас є перешкоди
+            // (вежі тощо), їх треба зареєструвати заново після rebuild:
+            // grid.RebuildWaterGrid(...);
+            // grid.RegisterObstacle(towerPos, towerRadius);
+        }
+
+        void AllocateBuffers(bool force = false)
+        {
+            int n = width * height;
+            bool sameLayout = !force && _terrainHeight != null
+                               && _allocW == width && _allocH == height;
+            if (sameLayout) return;
+
+            _bufA = new float[n];
+            _bufB = new float[n];
+            _solid = new bool[n];
+            _terrainHeight = new float[n];
+
+            _allocW = width;
+            _allocH = height;
         }
 
         private IEnumerator InitialDampingRoutine()
@@ -89,7 +145,8 @@ namespace Waves
         [ContextMenu("Regenerate Terrain From Lines")]
         public void RegenerateTerrainFromLines()
         {
-            EnsureBuffersAllocated();
+            //EnsureBuffersAllocated();
+            AllocateBuffers();
             GenerateNaturalTerrain();
         }
 
@@ -419,6 +476,17 @@ namespace Waves
             Debug.LogError($"[probe {label}] worldPos={worldPos} -> grid({gx},{gy}) | " +
                       $"_bufA={_bufA[i]:F3}, _terrainHeight={_terrainHeight[i]:F3}, _solid={_solid[i]}, " +
                       $"depthOnLand={_bufA[i] - _terrainHeight[i]:F3}");
+        }
+
+        public void SetWidthHeight(int width, int heigth)
+        {
+            this.width = width;
+            this.height = heigth;
+        }
+
+        public void SetRaisingTime(float risingTime)
+        {
+            this.risingTime = risingTime;
         }
     }
 }

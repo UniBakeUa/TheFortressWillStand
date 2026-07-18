@@ -6,6 +6,7 @@
         Shell,
         Jellyfish,
         Cheliks,
-        Airplane
+        Airplane,
+        Explosion
     }
 }

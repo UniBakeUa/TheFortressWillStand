@@ -7,11 +7,13 @@ namespace Items.Spawners
     {
         private readonly WaterGrid _waterGrid;
         private readonly Collider2D _spawnZone;
+        private readonly Shell _prefab;
 
         public WaterShellSpawner(Shell prefab, Transform container, WaterGrid waterGrid, Collider2D spawnZone) : base(prefab, container)
         {
             _waterGrid = waterGrid;
             _spawnZone = spawnZone;
+            _prefab = prefab;
         }
 
         protected override bool TryGetSpawnPosition(out Vector3 position)
@@ -31,9 +33,11 @@ namespace Items.Spawners
                 if (_spawnZone.OverlapPoint(randomPoint) && _waterGrid.IsFlooded(randomPoint))
                 {
                     position = randomPoint;
+                    position.z = _prefab.transform.position.z;
                     return true; // Точку знайдено успішно
                 }
             }
+
 
             return false;
         }

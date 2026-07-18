@@ -1,24 +1,36 @@
+using Managers;
 using System;
 using UnityEngine;
 
-    public enum GameState { Playing, Building, Paused }
+public enum GameState { Playing, Building, Paused }
 
-    public class GameStateManager : MonoBehaviour
+public class GameStateManager : MonoBehaviour
+{
+    public static GameStateManager Instance { get; private set; }
+    public GameState CurrentState { get; private set; }
+    public event Action<GameState> OnStateChange;
+
+    [SerializeField] private WaveManager _waveManager;
+    void Awake()
     {
-        public static GameStateManager Instance { get; private set; }
-        public GameState CurrentState { get; private set; }
-        public event Action<GameState> OnStateChange;
-        void Awake()
-        {
-            Instance = this;
-            CurrentState = GameState.Paused;
-        }
+        Instance = this;
+        CurrentState = GameState.Paused;
+    }
 
 
-        public void ChangeState(GameState newState)
+    public void ChangeState(GameState newState)
+    {
+        CurrentState = newState;
+        OnStateChange?.Invoke(newState);
+
+        CheckForAreaChanges(newState);
+    }
+
+    private void CheckForAreaChanges(GameState newState)
+    {
+        if (_waveManager.CurrentLevel > 6 && newState == GameState.Building)
         {
-            CurrentState = newState;
-            Debug.Log($"State changed to: {newState}");
-            OnStateChange?.Invoke(newState);
+            BuildManager.Instance.ChangeAreaConfig(1);
         }
+    }
 }

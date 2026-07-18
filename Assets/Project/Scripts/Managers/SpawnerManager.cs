@@ -3,6 +3,7 @@ using Items.Data;
 using Items.ScriptableObjects;
 using Items.Spawners;
 using System.Collections.Generic;
+using Towers;
 using UnityEngine;
 using Waves;
 
@@ -19,12 +20,14 @@ namespace Managers
         [SerializeField] private WaterGrid _waterGrid;
         [SerializeField] private Collider2D _shellSpawnZone;
         [SerializeField] private Collider2D _jellyfishSpawnZone;
+        [SerializeField] private Fortress _fortress;
 
+        private List<Airplane> _activeAirplanes = new();
         private Dictionary<SpawnableItemType, ISpawner> _spawners = new Dictionary<SpawnableItemType, ISpawner>();
 
         private void Awake()
         {
-            _spawners.Add(SpawnableItemType.Airplane, new AirplaneSpawner(_spawnConfig.GetPrefab<Airplane>(SpawnableItemType.Airplane), _itemContainer));
+            _spawners.Add(SpawnableItemType.Airplane, new AirplaneSpawner(_spawnConfig.GetPrefab<Airplane>(SpawnableItemType.Airplane), _itemContainer, _fortress, _activeAirplanes));
             _spawners.Add(SpawnableItemType.PONCHIC, new ScreenBottomSpawner(_spawnConfig.GetPrefab<PONCHIC>(SpawnableItemType.PONCHIC), _itemContainer));
             _spawners.Add(SpawnableItemType.Shell, new WaterShellSpawner(_spawnConfig.GetPrefab<Shell>(SpawnableItemType.Shell), _itemContainer, _waterGrid, _shellSpawnZone));
             _spawners.Add(SpawnableItemType.Cheliks, new CheliksSpawner(_spawnConfig.GetPrefab<Cheliks>(SpawnableItemType.Cheliks), _itemContainer, _waterGrid, _shellSpawnZone));
@@ -60,5 +63,7 @@ namespace Managers
                 }
             }
         }
+
+        public List<Airplane> ActiveAirplanes => _activeAirplanes;
     }
 }

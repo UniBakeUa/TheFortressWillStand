@@ -30,6 +30,7 @@ namespace Towers.Buildings
         {
             Collider = GetComponent<Collider2D>();
             WaterGrid = FindFirstObjectByType<WaterGrid>();
+            WaterGrid.OnGridRebuilt += OnGridRebuilt;
         }
 
         public virtual void Initialize(BuildingConfig config)
@@ -51,6 +52,7 @@ namespace Towers.Buildings
         {
             var bounds = Collider.bounds;
             _registeredRadius = Mathf.Max(bounds.extents.x, bounds.extents.y);
+            _registeredRadius = 0.5f;
             WaterGrid.RegisterObstacle(bounds.center, _registeredRadius);
         }
 
@@ -71,6 +73,13 @@ namespace Towers.Buildings
                 float damage = exposure * ErosionRate * Time.fixedDeltaTime;
                 TakeDamage(damage);
             }
+        }
+
+        protected virtual void OnGridRebuilt()
+        {
+            if (!IsReady) return;
+            var bounds = Collider.bounds;
+            WaterGrid.RegisterObstacle(bounds.center, _registeredRadius);
         }
 
         public virtual void TakeDamage(float amount)
@@ -110,6 +119,12 @@ namespace Towers.Buildings
         public void Repair(float amount)
         {
              Model.CurrentHP = Mathf.Min(Model.MaxHP, Model.CurrentHP + amount);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (WaterGrid != null)
+                WaterGrid.OnGridRebuilt -= OnGridRebuilt;
         }
     }
 }

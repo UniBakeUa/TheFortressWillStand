@@ -196,7 +196,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moneyValue: 1
-  speed: 10
+  speed: 6
   crashGravity: 5
   crashRotation: 300
   falling: {fileID: 8300000, guid: 6f589bce4df7ee74cb18d4f82f148e42, type: 3}
@@ -204,6 +204,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: f35747402dee82042b94bc4ae07fb459, type: 3}
   - {fileID: 8300000, guid: b440a9d704d5d8e47857a9558d544835, type: 3}
   - {fileID: 8300000, guid: 6f51839fbe748e74897d3590cd959cbe, type: 3}
+  _explosionPrefab: {fileID: 5717577051735948075, guid: 4bc825b1ec021e744981813233d0aad4, type: 3}
+  _epxlosionDamage: 15
 --- !u!50 &-5513342789973775605
 Rigidbody2D:
   serializedVersion: 5

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using NUnit.Framework;
 using System.Collections.Generic;
 using Towers;
@@ -5,12 +6,15 @@ using Towers.Buildings;
 using Towers.Data;
 using Towers.ScriptableObjects;
 using UnityEngine;
+using Waves;
 
 namespace Managers
 {
     public class BuildManager : MonoBehaviour
     {
         public static BuildManager Instance { get; private set; }
+
+        [SerializeField] private WaterGrid _waterGrid;
 
         [Header("База даних будівель")]
         [SerializeField] private BuildingLibrary _buildingLibrary;
@@ -26,9 +30,15 @@ namespace Managers
         [SerializeField] private Color forbiddenGhostColor = new Color(1f, 0.3f, 0.3f, 0.6f);
         [SerializeField] private LayerMask wallmask;
 
+        [Header("Світ та об'єкти")]
+        [SerializeField] private Transform _sandTransform;
+
+        [SerializeField] private SpawnerManager _spawnerManager;
+
         private int _currentSelectionId = -1;
-        private BuildingConfig _currentConfig;
-        private BuildingAreaConfig _buildingAreaConfig;
+        private BuildingConfig _currentBuildingConfig;
+        private BuildingAreaConfig _areaConfig;
+        private int _currentConfigID = -1;
 
         private GameObject _towerGhost;
         private GameObject _wallGhost;
@@ -46,25 +56,51 @@ namespace Managers
 
         private void Start()
         {
-            InitBuildingArea(_buildingAreaConfigList[0]);
-            DrawZone();
-
-            _buildZone = new Rect(
-                _buildingAreaConfig.MinBuildX, _buildingAreaConfig.MinBuildY, 
-                _buildingAreaConfig.MaxBuildX - _buildingAreaConfig.MinBuildX,
-                _buildingAreaConfig.MaxBuildY - _buildingAreaConfig.MinBuildY);
-
-            _moneyManager = MoneyManager.Instance;
+            // Default area config
+            ChangeAreaConfig(0);
+             _moneyManager = MoneyManager.Instance;
 
             if (GameStateManager.Instance != null)
                 GameStateManager.Instance.OnStateChange += ToggleBuildMode;
+        }
+
+        public void ChangeAreaConfig(int configID)
+        {
+            if (_currentConfigID == configID)
+                return;
+
+            _currentConfigID = configID;
+            Debug.Log("Rebuild");
+            _areaConfig = _buildingAreaConfigList[configID];
+
+            InitBuildZone();
+            _waterGrid.RebuildWaterGrid(_areaConfig.GridWidth, _areaConfig.GridHeight, 0.125f, _areaConfig.GridOrigin);
+        }
+
+        private void InitBuildZone()
+        {
+            Camera.main.DOOrthoSize(_areaConfig.CameraSize, 2.5f)
+          .SetEase(Ease.OutCubic);
+
+            _sandTransform.transform.position = _areaConfig.SandPosition;
+            _sandTransform.transform.localScale = _areaConfig.SandScale;
+
+            _waterGrid.SetWidthHeight(_areaConfig.GridWidth, _areaConfig.GridHeight);
+            _waterGrid.SetRaisingTime(_areaConfig.RisingTime);
+
+            DrawZone();
+
+            _buildZone = new Rect(
+                _areaConfig.MinBuildX, _areaConfig.MinBuildY,
+                _areaConfig.MaxBuildX - _areaConfig.MinBuildX,
+                _areaConfig.MaxBuildY - _areaConfig.MinBuildY);
+
         }
 
         public void SetRepairMode(bool active)
         {
             _isRepairMode = active;
             if (active) DeselectStructure();
-            Debug.Log($"Repair mode: {active}");
         }
 
         public void SelectStructure(int id)
@@ -84,17 +120,17 @@ namespace Managers
             }
 
             _currentSelectionId = id;
-            _currentConfig = config;
+            _currentBuildingConfig = config;
             UpdateSelectionPrefabs();
         }
 
         private void DrawZone()
         {
             Vector3[] corners = new Vector3[4];
-            corners[0] = new Vector2(_buildingAreaConfig.MinBuildX, _buildingAreaConfig.MinBuildY);
-            corners[1] = new Vector2(_buildingAreaConfig.MaxBuildX, _buildingAreaConfig.MinBuildY);
-            corners[2] = new Vector2(_buildingAreaConfig.MaxBuildX, _buildingAreaConfig.MaxBuildY);
-            corners[3] = new Vector2(_buildingAreaConfig.MinBuildX, _buildingAreaConfig.MaxBuildY);
+            corners[0] = new Vector2(_areaConfig.MinBuildX, _areaConfig.MinBuildY);
+            corners[1] = new Vector2(_areaConfig.MaxBuildX, _areaConfig.MinBuildY);
+            corners[2] = new Vector2(_areaConfig.MaxBuildX, _areaConfig.MaxBuildY);
+            corners[3] = new Vector2(_areaConfig.MinBuildX, _areaConfig.MaxBuildY);
 
             _lineRenderer.SetPositions(corners);
         }
@@ -108,15 +144,15 @@ namespace Managers
             _wallGhost = null;
             _wallGhostLR = null;
 
-            if (_currentConfig == null || _currentConfig.Prefab == null) return;
+            if (_currentBuildingConfig == null || _currentBuildingConfig.Prefab == null) return;
 
-            if (_currentConfig.GhostPrefab != null)
+            if (_currentBuildingConfig.GhostPrefab != null)
             {
-                _towerGhost = Instantiate(_currentConfig.GhostPrefab, transform);
+                _towerGhost = Instantiate(_currentBuildingConfig.GhostPrefab, transform);
                 _towerGhost.SetActive(false);
             }
 
-            if (_currentConfig is ITowerData towerData && towerData.WallConfig != null)
+            if (_currentBuildingConfig is ITowerData towerData && towerData.WallConfig != null)
             {
                 if (towerData.WallConfig.GhostPrefab != null)
                 {
@@ -149,11 +185,6 @@ namespace Managers
             if (Input.GetMouseButtonDown(0)) HandleClick(mousePos);
         }
 
-        private void InitBuildingArea(BuildingAreaConfig config)
-        {
-            _buildingAreaConfig = config;
-        }
-
         private void RepairStructure(BaseBuilding target)
         {
             if (target is Fortress) return;
@@ -177,7 +208,7 @@ namespace Managers
         {
             bool isShiftPressed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
-            Transform snappedTowerTransform = GetNearbyMatchingTower(pos, _buildingAreaConfig.SnapRadius);
+            Transform snappedTowerTransform = GetNearbyMatchingTower(pos, _areaConfig.SnapRadius);
             ITower clickedTower = snappedTowerTransform != null ? snappedTowerTransform.GetComponent<ITower>() : GetTowerAt(pos);
 
             // 1. Ремонт
@@ -210,15 +241,15 @@ namespace Managers
                     return;
                 }
 
-                if (_currentConfig == null) return;
+                if (_currentBuildingConfig == null) return;
 
-                if (_moneyManager.GetMoney() < _currentConfig.BaseCost)
+                if (_moneyManager.GetMoney() < _currentBuildingConfig.BaseCost)
                 {
                     _moneyManager.ShowNotEnoughPopup();
                     return;
                 }
 
-                _moneyManager.SpendMoney(_currentConfig.BaseCost);
+                _moneyManager.SpendMoney(_currentBuildingConfig.BaseCost);
                 _firstSelectedTower = CreateStructure(pos);
                 return;
             }
@@ -239,16 +270,16 @@ namespace Managers
                 }
 
                 int wallCost = 0;
-                if (_currentConfig is ITowerData towerData && towerData.WallConfig != null)
+                if (_currentBuildingConfig is ITowerData towerData && towerData.WallConfig != null)
                 {
                     wallCost = towerData.WallConfig.BaseCost;
                 }
 
-                int totalCost = _currentConfig.BaseCost + wallCost;
+                int totalCost = _currentBuildingConfig.BaseCost + wallCost;
 
                 if (_moneyManager.GetMoney() >= totalCost)
                 {
-                    _moneyManager.SpendMoney(_currentConfig.BaseCost);
+                    _moneyManager.SpendMoney(_currentBuildingConfig.BaseCost);
 
                     ITower newTower = CreateStructure(pos);
                     if (newTower != null)
@@ -271,7 +302,6 @@ namespace Managers
             {
                 if (hit.GetComponentInParent<IDamageable>() != null) 
                 {
-                    Debug.Log(hit);
                     return true;
                 }
             }
@@ -307,19 +337,19 @@ namespace Managers
         public void DeselectStructure()
         {
             _currentSelectionId = -1;
-            _currentConfig = null;
+            _currentBuildingConfig = null;
             if (_towerGhost != null) _towerGhost.SetActive(false);
             if (_wallGhost != null) _wallGhost.SetActive(false);
         }
 
         private ITower CreateStructure(Vector2 pos)
         {
-            GameObject go = Instantiate(_currentConfig.Prefab, pos, Quaternion.identity, transform);
+            GameObject go = Instantiate(_currentBuildingConfig.Prefab, pos, Quaternion.identity, transform);
 
             // Викликаємо ініціалізацію, яка автоматично підніме HP, запустить анімацію і Footprint!
             if (go.TryGetComponent(out BaseBuilding baseBuilding))
             {
-                baseBuilding.Initialize(_currentConfig);
+                baseBuilding.Initialize(_currentBuildingConfig);
             }
 
             ITower t = go.GetComponent<ITower>();
@@ -375,14 +405,16 @@ namespace Managers
                 _firstSelectedTower = null; // Скидаємо мертве посилання
             }
 
-            Transform snappedTower = GetNearbyMatchingTower(mousePos, _buildingAreaConfig.SnapRadius);
+            bool hasValidTransform = _firstSelectedTower != null && _firstSelectedTower.Transform != null;
+
+            Transform snappedTower = GetNearbyMatchingTower(mousePos, _areaConfig.SnapRadius);
             bool isSnapped = snappedTower != null;
 
             Vector2 ghostPos = isSnapped ? (Vector2)snappedTower.position : mousePos;
 
             bool canBuild = isSnapped || (IsWithinBuildableZone(ghostPos) && !IsOccupied(ghostPos));
 
-            if (_wallGhost != null && _wallGhost.activeSelf && _firstSelectedTower != null)
+            if (_wallGhost != null && _wallGhost.activeSelf && hasValidTransform)
             {
                 if (IsWallIntersecting(_firstSelectedTower.Transform.position, ghostPos))
                     canBuild = false;
@@ -396,7 +428,7 @@ namespace Managers
 
             if (_wallGhost != null)
             {
-                if (_firstSelectedTower != null)
+                if (hasValidTransform)
                 {
                     _wallGhost.SetActive(true);
                     _wallGhostLR.SetPosition(0, _firstSelectedTower.Transform.position);
@@ -449,7 +481,7 @@ namespace Managers
         // Drill (і будь-яка інша не-веже-подібна структура) не реалізує IWallConnectable -
         // тому клік по існуючій вежі не повинен починати wall-drag, якщо зараз обрано таке
         private bool IsCurrentSelectionWallConnectable() =>
-            _currentConfig != null && _currentConfig.Prefab != null && _currentConfig.Prefab.GetComponent<ITower>() != null;
+            _currentBuildingConfig != null && _currentBuildingConfig.Prefab != null && _currentBuildingConfig.Prefab.GetComponent<ITower>() != null;
 
         private ITower GetTowerAt(Vector2 pos)
         {
@@ -484,5 +516,7 @@ namespace Managers
         {
             if (state != GameState.Building) ResetSelection();
         }
+
+        public SpawnerManager SpawnerManager => _spawnerManager;
     }
 }
