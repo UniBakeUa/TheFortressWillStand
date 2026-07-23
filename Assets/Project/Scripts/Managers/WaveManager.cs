@@ -10,11 +10,13 @@ namespace Managers
     {
         [SerializeField] private TextMeshProUGUI _waveLevelText;
         [SerializeField] private WaveTimerView _waveTimerView;
+        [SerializeField] private SpawnerManager _spawnerManager;
         [SerializeField] WaterGrid waterGrid;
         [SerializeField] float delayBetweenWaves = 2.0f;
         [SerializeField] float delayBetweenStages = 10.0f;
 
         private int _currentStage = 1;
+        private bool isStageFinished = false;
         private Coroutine _waveCoroutine;
         private int _totalSequencesPlayed = 0; // Лічильник загальної кількості циклів
         [SerializeField] private int extraWavesEveryXStages = 5;
@@ -54,12 +56,18 @@ namespace Managers
                 _waveLevelText.SetText("Wave: " + (CurrentLevel + 1));
             }
         }
+        public bool IsStageFinished()
+        {
+            return isStageFinished;
+        }
 
         IEnumerator WaveProgressionRoutine()
         {
             while (true)
             {
                 // 1. Оновлення стадії
+                isStageFinished = false;
+
                 _totalSequencesPlayed++;
                 if (_totalSequencesPlayed % extraWavesEveryXStages == 0)
                 {
@@ -80,7 +88,6 @@ namespace Managers
                 _waveTimerView.ShowTimer(totalStageTime); // Встановлюємо maxValue
 
                 // 3. Запускаємо логіку хвиль паралельно
-                bool isStageFinished = false;
                 StartCoroutine(PlayWavesSequence(_currentStage, () => isStageFinished = true));
 
                 // 4. Плавно оновлюємо таймер зворотного відліку
@@ -93,7 +100,9 @@ namespace Managers
 
                     yield return null;
                 }
+                // Після завершення всіх хвиль стадії, спавнер зупиняє роботу і доки всі вороги не будуть знищені стан не зміниться на Building
 
+                yield return new WaitUntil(() => _spawnerManager.CheckIsAllDead() == true);
                 Debug.Log("go to building");
 
                 // 5. Завершення стадії - перехід в Building

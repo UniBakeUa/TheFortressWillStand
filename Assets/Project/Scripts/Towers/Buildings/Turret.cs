@@ -17,8 +17,10 @@ public class Turret : BaseBuilding
 
     private float _timer;
     private List<Airplane> _activeAirplanes = new();
+    private List<Enemy> _activeEnemies = new();
 
     private Airplane _currentTarget;
+    private Enemy _currentTargetEnemy;
     private Vector3 _lastTarget;
 
     [SerializeField] private Transform _turretVisual;
@@ -28,6 +30,7 @@ public class Turret : BaseBuilding
         TurretModel = new TurretModel(config as TurretConfig);
 
         _activeAirplanes = BuildManager.Instance.SpawnerManager.ActiveAirplanes;
+        _activeEnemies = BuildManager.Instance.SpawnerManager.ActiveEnemies;
         _turretView = _buildingView as TurretView;
         if (_turretView != null)
         {
@@ -41,23 +44,40 @@ public class Turret : BaseBuilding
 
         FindClosestTarget();
         _timer += Time.deltaTime;
-        if (_timer >= TurretModel.CoolDown) 
+        if (_timer >= TurretModel.CoolDown)
         {
             if (_currentTarget != null)
             {
-                Shoot();
+                ShootPlane();
+            }
+            else if (_currentTargetEnemy != null)
+            {
+                ShootEnemy();
             }
         }
         else if (_turretView != null)
         {
             _turretView.UpdateMoneyTimer(_timer);
-        }  
+        }
     }
 
     private void FindClosestTarget()
     {
         float closestDistance = float.MaxValue;
         Vector2 myPos = transform.position;
+        foreach (var enemy in _activeEnemies)
+        {
+            if (enemy == null || !enemy.isActiveAndEnabled) continue;
+
+            Vector2 enemyPos = enemy.transform.position;
+            float sqrDst = (enemyPos - myPos).sqrMagnitude;
+
+            if (sqrDst < closestDistance)
+            {
+                closestDistance = sqrDst;
+                _currentTargetEnemy = enemy;
+            }
+        }
 
         foreach (var plane in _activeAirplanes)
         {
@@ -73,19 +93,32 @@ public class Turret : BaseBuilding
             }
         }
 
-        float sqrAttackRange = TurretModel.AttackRange * TurretModel.AttackRange;
 
+        float sqrAttackRange = TurretModel.AttackRange * TurretModel.AttackRange;
+        if (_currentTargetEnemy != null && closestDistance > sqrAttackRange)
+        {
+            _currentTargetEnemy = null;
+        }
         if (_currentTarget != null && closestDistance > sqrAttackRange)
         {
             _currentTarget = null;
         }
     }
 
+    private void ShootEnemy()
+    {
+        _lastTarget = _currentTargetEnemy.transform.position;
+        _currentTargetEnemy.WasStricken();
 
-    private void Shoot()
+        _currentTargetEnemy = null;
+        _timer = 0f;
+    }
+    private void ShootPlane()
     {
         _lastTarget = _currentTarget.transform.position;
         _currentTarget.WasStricken();
+
+        _currentTarget = null;
         _timer = 0f;
     }
 

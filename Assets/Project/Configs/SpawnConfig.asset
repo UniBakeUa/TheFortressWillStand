@@ -34,7 +34,47 @@ MonoBehaviour:
     <SpawnInterval>k__BackingField: 5
     <Prefab>k__BackingField: {fileID: -6911145471791022444, guid: a62f667b1167d7a4c8d0e0abe4f0859b, type: 3}
   - <ItemType>k__BackingField: 4
-    <StartingWave>k__BackingField: 1
+    <StartingWave>k__BackingField: 3
     <SpawnChance>k__BackingField: 15
     <SpawnInterval>k__BackingField: 1
     <Prefab>k__BackingField: {fileID: -5301170254801526072, guid: 89ca1837a12dbbf439fd6c9537b8c64d, type: 3}
+  - <ItemType>k__BackingField: 5
+    <StartingWave>k__BackingField: 1
+    <SpawnChance>k__BackingField: 75
+    <SpawnInterval>k__BackingField: 1
+    <Prefab>k__BackingField: {fileID: -5301170254801526072, guid: dc072f58047e6c74b83dd500e0069e7b, type: 3}
+  - <ItemType>k__BackingField: 6
+    <StartingWave>k__BackingField: 2
+    <SpawnChance>k__BackingField: 40
+    <SpawnInterval>k__BackingField: 1
+    <Prefab>k__BackingField: {fileID: -5301170254801526072, guid: 4246ccf5e7b97b544848709a1d6471fe, type: 3}
+  - <ItemType>k__BackingField: 8
+    <StartingWave>k__BackingField: 1
+    <SpawnChance>k__BackingField: 80
+    <SpawnInterval>k__BackingField: 0.3
+    <Prefab>k__BackingField: {fileID: 5853395905259153123, guid: 84ceb10da0077c94ea8d56cc22d45958, type: 3}
+  - <ItemType>k__BackingField: 9
+    <StartingWave>k__BackingField: 2
+    <SpawnChance>k__BackingField: 50
+    <SpawnInterval>k__BackingField: 0.5
+    <Prefab>k__BackingField: {fileID: 5853395905259153123, guid: 84ceb10da0077c94ea8d56cc22d45958, type: 3}
+  - <ItemType>k__BackingField: 10
+    <StartingWave>k__BackingField: 3
+    <SpawnChance>k__BackingField: 30
+    <SpawnInterval>k__BackingField: 0.5
+    <Prefab>k__BackingField: {fileID: 5853395905259153123, guid: dcbc7c16b37fc334fa0aa034bc69f91a, type: 3}
+  - <ItemType>k__BackingField: 11
+    <StartingWave>k__BackingField: 4
+    <SpawnChance>k__BackingField: 20
+    <SpawnInterval>k__BackingField: 0.5
+    <Prefab>k__BackingField: {fileID: 5853395905259153123, guid: 5385bf22a243cd7499be8915989a66a1, type: 3}
+  - <ItemType>k__BackingField: 12
+    <StartingWave>k__BackingField: 5
+    <SpawnChance>k__BackingField: 7
+    <SpawnInterval>k__BackingField: 1
+    <Prefab>k__BackingField: {fileID: 5853395905259153123, guid: 7188175ec2c6e944895a19352f57104b, type: 3}
+  - <ItemType>k__BackingField: 13
+    <StartingWave>k__BackingField: 8
+    <SpawnChance>k__BackingField: 5
+    <SpawnInterval>k__BackingField: 2
+    <Prefab>k__BackingField: {fileID: 5853395905259153123, guid: 699eed02656aac143acae4dd116cb231, type: 3}

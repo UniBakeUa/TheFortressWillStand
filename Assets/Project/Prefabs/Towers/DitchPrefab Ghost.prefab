@@ -8,9 +8,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 246712701363813618, guid: 621f51584b56edd48b0f59567583659e, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2015169169063773784, guid: 621f51584b56edd48b0f59567583659e, type: 3}
       propertyPath: m_Color.b
-      value: 0.42352942
+      value: 0.47843137
       objectReference: {fileID: 0}
     - target: {fileID: 2015169169063773784, guid: 621f51584b56edd48b0f59567583659e, type: 3}
       propertyPath: m_Color.g
@@ -18,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2015169169063773784, guid: 621f51584b56edd48b0f59567583659e, type: 3}
       propertyPath: m_Color.r
-      value: 0.43137255
+      value: 0.4745098
       objectReference: {fileID: 0}
     - target: {fileID: 3375714824414076761, guid: 621f51584b56edd48b0f59567583659e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -60,9 +64,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4579273231645761330, guid: 621f51584b56edd48b0f59567583659e, type: 3}
+      propertyPath: m_Color.b
+      value: 0.28773582
+      objectReference: {fileID: 0}
+    - target: {fileID: 4579273231645761330, guid: 621f51584b56edd48b0f59567583659e, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4579273231645761330, guid: 621f51584b56edd48b0f59567583659e, type: 3}
+      propertyPath: m_Color.r
+      value: 0.30958006
+      objectReference: {fileID: 0}
     - target: {fileID: 5377761115089344857, guid: 621f51584b56edd48b0f59567583659e, type: 3}
       propertyPath: m_Name
       value: DitchPrefab Ghost
+      objectReference: {fileID: 0}
+    - target: {fileID: 7912923305688322914, guid: 621f51584b56edd48b0f59567583659e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7550435688274253303, guid: 621f51584b56edd48b0f59567583659e, type: 3}

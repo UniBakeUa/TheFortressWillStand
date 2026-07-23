@@ -1,6 +1,5 @@
 using UI;
 using UI.Factories;
-using Unity.Android.Gradle;
 using UnityEngine;
 
 namespace Items
@@ -16,7 +15,7 @@ namespace Items
         [Header("Impulse Settings")]
         [SerializeField] private float minForce = 5f;
         [SerializeField] private float maxForce = 8f;
-        [SerializeField] private float sideForceRange = 2f; // Наскільки сильно вбік
+        [SerializeField] private float sideForceRange = 2f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
         [SerializeField] private float rotationSpeed = 100f;
 
         [SerializeField] private AudioClip _audioClip;

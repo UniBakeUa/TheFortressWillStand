@@ -15,8 +15,8 @@ MonoBehaviour:
   <StructureName>k__BackingField: Ditch Wall
   <Id>k__BackingField: -2
   <BaseCost>k__BackingField: 2
-  <BaseHP>k__BackingField: 80
+  <BaseHP>k__BackingField: 100
   <BaseErosionRate>k__BackingField: 50
   <Prefab>k__BackingField: {fileID: 6735924450428262514, guid: 856b051f1cf749e46ba0802e0a9b5545, type: 3}
-  <GhostPrefab>k__BackingField: {fileID: 8386037578680224590, guid: 84a2ae84a10e8d2448cb861ece6d75ff, type: 3}
+  <GhostPrefab>k__BackingField: {fileID: 1265835367675262032, guid: 6fb30862a2474714a90b62785e365444, type: 3}
   <WallHalfWidth>k__BackingField: 0.15

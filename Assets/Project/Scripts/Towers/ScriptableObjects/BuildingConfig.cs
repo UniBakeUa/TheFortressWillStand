@@ -4,7 +4,7 @@ namespace Towers.ScriptableObjects
 {
     public class BuildingConfig : ScriptableObject
     {
-        [Header("Базова інформація")]
+        [Header("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")]
         [field: SerializeField] public string StructureName { get; private set; }
         [field: SerializeField] public int Id { get; private set; }
         [field: SerializeField] public int BaseCost { get; private set; }

@@ -20,4 +20,4 @@ MonoBehaviour:
   <Prefab>k__BackingField: {fileID: 4696339223599300327, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
   <GhostPrefab>k__BackingField: {fileID: 2938546580043930645, guid: 73b26d0c640376146b1339915a0b561b, type: 3}
   <IncomeAmount>k__BackingField: 1
-  <IncomeInterval>k__BackingField: 5
+  <IncomeInterval>k__BackingField: 4

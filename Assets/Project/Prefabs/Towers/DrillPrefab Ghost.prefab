@@ -8,6 +8,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 639003494208384316, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2921150735837186182, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3691645925139247610, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4696339223599300327, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
       propertyPath: m_Name
       value: DrillPrefab Ghost
@@ -54,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5391150309100884127, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
       propertyPath: m_Color.b
-      value: 0.42352942
+      value: 0.47843137
       objectReference: {fileID: 0}
     - target: {fileID: 5391150309100884127, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
       propertyPath: m_Color.g
@@ -62,7 +74,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5391150309100884127, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
       propertyPath: m_Color.r
-      value: 0.43137255
+      value: 0.4745098
+      objectReference: {fileID: 0}
+    - target: {fileID: 7534022387741348661, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
+      propertyPath: m_Color.b
+      value: 0.47843137
+      objectReference: {fileID: 0}
+    - target: {fileID: 7534022387741348661, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7534022387741348661, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
+      propertyPath: m_Color.r
+      value: 0.4745098
+      objectReference: {fileID: 0}
+    - target: {fileID: 8183289591161788093, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 961741850442852024, guid: 72106aff83d3eeb47a39358eb47d8fa1, type: 3}
