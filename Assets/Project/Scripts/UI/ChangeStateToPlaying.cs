@@ -7,6 +7,8 @@ namespace UI
     {
         [SerializeField] private float _timeToStart;
         [SerializeField] private Slider _timerSlider;
+        [SerializeField] private PekpekMessage _pekpekMessage;
+        private bool _oncePekpek;
 
         private float _timer;
 
@@ -22,6 +24,9 @@ namespace UI
             GameStateManager.Instance.ChangeState(GameState.Playing);
             _timer = _timeToStart;
             _timerSlider.value = _timer;
+
+            _oncePekpek = false;
+            _pekpekMessage.FoldIn();
         }
 
         public void OnTimerEnd()
@@ -31,6 +36,9 @@ namespace UI
             GameStateManager.Instance.ChangeState(GameState.Playing);
             _timer = _timeToStart;
             _timerSlider.value = _timer;
+
+            _oncePekpek = false;
+            _pekpekMessage.FoldIn();
         }
 
         private void Update()
@@ -39,6 +47,11 @@ namespace UI
 
             _timer -= Time.deltaTime;
             _timerSlider.value = _timer;
+            if(!_oncePekpek && _timer <= _timeToStart / 2)
+            {
+                _oncePekpek = true;
+                _pekpekMessage.Unfold();
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ namespace Items
 
         [Header("Audio")]
         [SerializeField] private AudioClip falling;
+        [SerializeField] private AudioClip shotSound;
         [SerializeField] private AudioClip[] voiceLines;
 
         private Rigidbody2D rb;
@@ -107,6 +108,7 @@ namespace Items
         {
             isBombDropped = true;
             Instantiate(_explosionPrefab, GetRandomPositionAround(Fortress.transform.position, 0.4f), Quaternion.identity);
+            AudioSource.PlayClipAtPoint(shotSound, Fortress.transform.position, 0.5f);
             _fortress.GetComponentInParent<IDamageable>().TakeDamage(damage);
         }
         private Vector3 GetRandomPositionAround(Vector3 center, float radius)
