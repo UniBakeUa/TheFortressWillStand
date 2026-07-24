@@ -106,6 +106,8 @@ namespace Items
 
             MoneyManager.Instance.AddMoney(moneyValue);
             StartFalling();
+
+            // Літак видаляється зі списку активних літаків.
             _activeAirplaneslistReference.Remove(this);
         }
 
@@ -149,6 +151,9 @@ namespace Items
             yield return new WaitUntil(() => !IsInCameraRange(_camera));
             yield return new WaitForSeconds(1f);
             Finish();
+
+            // Літак видаляється зі списку активних літаків.
+            //_activeAirplaneslistReference.Remove(this);
         }
 
         private bool IsInCameraRange(Camera camera)

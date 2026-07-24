@@ -123,7 +123,8 @@ namespace Items
         {
             PlayFallingAudio();
 
-            MoneyManager.Instance.AddMoney(moneyValue);
+            base.Collect();
+            //MoneyManager.Instance.AddMoney(moneyValue);
             StartFalling();
             _activeEnemieslistReference.Remove(this);
         }
@@ -148,6 +149,8 @@ namespace Items
 
         public void WasStricken()
         {
+            if (isDead) return;
+
             isDead = true;
 
             Collect();
@@ -198,5 +201,4 @@ namespace Items
 
         }
     }
-
 }
