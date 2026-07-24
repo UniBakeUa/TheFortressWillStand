@@ -21,5 +21,14 @@ namespace Items.Data
 
         [field: Tooltip("Префаб предмету")]
         [field: SerializeField] public ClickableItem Prefab { get; private set; }
+
+        public ItemSpawnData(SpawnableItemType itemType, int startingWave, float spawnChance, float spawnInterval, ClickableItem prefab)
+        {
+            ItemType = itemType;
+            StartingWave = startingWave;
+            SpawnChance = spawnChance;
+            SpawnInterval = spawnInterval;
+            Prefab = prefab;
+        }
     }
 }

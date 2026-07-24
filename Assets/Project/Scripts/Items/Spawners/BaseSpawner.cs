@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Items.Spawners
 {
-    public abstract class BaseSpawner<T>: ISpawner where T : ClickableItem
+    public abstract class BaseSpawner<T> : ISpawner where T : ClickableItem
     {
         protected readonly Transform container;
 
@@ -20,9 +20,11 @@ namespace Items.Spawners
         {
             if (GameStateManager.Instance.CurrentState != GameState.Playing) return;
 
+            Debug.Log($"Trying to spawn a {spawnData.ItemType}");
             _timer += Time.deltaTime;
             if (_timer >= spawnData.SpawnInterval)
             {
+                Debug.Log($"{spawnData.ItemType} just spawned");
                 _timer = 0;
 
                 if (Random.Range(0f, 100f) <= spawnData.SpawnChance)

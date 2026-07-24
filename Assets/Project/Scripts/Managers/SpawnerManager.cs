@@ -29,19 +29,19 @@ namespace Managers
 
         private void Awake()
         {
-            _spawners.Add(SpawnableItemType.Airplane, new AirplaneSpawner(_spawnConfig.GetPrefab<Airplane>(SpawnableItemType.Airplane), _itemContainer, _fortress, _activeAirplanes));
+            //_spawners.Add(SpawnableItemType.Airplane, new AirplaneSpawner(_spawnConfig.GetPrefab<Airplane>(SpawnableItemType.Airplane), _itemContainer, _fortress, _activeAirplanes));
             _spawners.Add(SpawnableItemType.Airplane1, new AirplaneSpawner(_spawnConfig.GetPrefab<Airplane>(SpawnableItemType.Airplane1), _itemContainer, _fortress, _activeAirplanes));
-            _spawners.Add(SpawnableItemType.Airplane2, new AirplaneSpawner(_spawnConfig.GetPrefab<Airplane>(SpawnableItemType.Airplane2), _itemContainer, _fortress, _activeAirplanes));
-            _spawners.Add(SpawnableItemType.Enemy, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy), _itemContainer, _fortress, _activeEnemies));
-            _spawners.Add(SpawnableItemType.Enemy1, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy1), _itemContainer, _fortress, _activeEnemies));
-            _spawners.Add(SpawnableItemType.Enemy2, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy2), _itemContainer, _fortress, _activeEnemies));
-            _spawners.Add(SpawnableItemType.Enemy3, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy3), _itemContainer, _fortress, _activeEnemies));
-            _spawners.Add(SpawnableItemType.Enemy4, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy4), _itemContainer, _fortress, _activeEnemies));
-            _spawners.Add(SpawnableItemType.Enemy5, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy5), _itemContainer, _fortress, _activeEnemies));
-            _spawners.Add(SpawnableItemType.PONCHIC, new ScreenBottomSpawner(_spawnConfig.GetPrefab<PONCHIC>(SpawnableItemType.PONCHIC), _itemContainer));
-            _spawners.Add(SpawnableItemType.Shell, new WaterShellSpawner(_spawnConfig.GetPrefab<Shell>(SpawnableItemType.Shell), _itemContainer, _waterGrid, _shellSpawnZone));
-            _spawners.Add(SpawnableItemType.Cheliks, new CheliksSpawner(_spawnConfig.GetPrefab<Cheliks>(SpawnableItemType.Cheliks), _itemContainer, _waterGrid, _shellSpawnZone));
-            _spawners.Add(SpawnableItemType.Jellyfish, new JellyfishSpawner(_spawnConfig.GetPrefab<Jellyfish>(SpawnableItemType.Jellyfish), _itemContainer, _waterGrid, _jellyfishSpawnZone));
+            //_spawners.Add(SpawnableItemType.Airplane2, new AirplaneSpawner(_spawnConfig.GetPrefab<Airplane>(SpawnableItemType.Airplane2), _itemContainer, _fortress, _activeAirplanes));
+            //_spawners.Add(SpawnableItemType.Enemy, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy), _itemContainer, _fortress, _activeEnemies));
+            //_spawners.Add(SpawnableItemType.Enemy1, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy1), _itemContainer, _fortress, _activeEnemies));
+            //_spawners.Add(SpawnableItemType.Enemy2, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy2), _itemContainer, _fortress, _activeEnemies));
+            //_spawners.Add(SpawnableItemType.Enemy3, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy3), _itemContainer, _fortress, _activeEnemies));
+            //_spawners.Add(SpawnableItemType.Enemy4, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy4), _itemContainer, _fortress, _activeEnemies));
+            //_spawners.Add(SpawnableItemType.Enemy5, new EnemySpawner(_spawnConfig.GetPrefab<Enemy>(SpawnableItemType.Enemy5), _itemContainer, _fortress, _activeEnemies));
+            //_spawners.Add(SpawnableItemType.PONCHIC, new ScreenBottomSpawner(_spawnConfig.GetPrefab<PONCHIC>(SpawnableItemType.PONCHIC), _itemContainer));
+            //_spawners.Add(SpawnableItemType.Shell, new WaterShellSpawner(_spawnConfig.GetPrefab<Shell>(SpawnableItemType.Shell), _itemContainer, _waterGrid, _shellSpawnZone));
+            //_spawners.Add(SpawnableItemType.Cheliks, new CheliksSpawner(_spawnConfig.GetPrefab<Cheliks>(SpawnableItemType.Cheliks), _itemContainer, _waterGrid, _shellSpawnZone));
+            //_spawners.Add(SpawnableItemType.Jellyfish, new JellyfishSpawner(_spawnConfig.GetPrefab<Jellyfish>(SpawnableItemType.Jellyfish), _itemContainer, _waterGrid, _jellyfishSpawnZone));
         }
 
         private void OnValidate()
@@ -64,6 +64,7 @@ namespace Managers
         }
         private void Update()
         {
+            print("6");
             if (GameStateManager.Instance.CurrentState == GameState.Playing && !_waveManager.IsStageFinished())
             {
                 foreach (var spawnerData in _spawners)

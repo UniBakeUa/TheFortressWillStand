@@ -3721,6 +3721,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _radius: 0.5
+  shotSound: {fileID: 8300000, guid: 711423df82341e645861e3323eb84fd2, type: 3}
   _explosionPrefab: {fileID: 5717577051735948075, guid: 4bc825b1ec021e744981813233d0aad4, type: 3}
 --- !u!114 &834457411
 MonoBehaviour:

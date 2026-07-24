@@ -4,6 +4,8 @@ using System.Collections;
 using Towers;
 using System.Collections.Generic;
 using static UnityEditor.Progress;
+using Items.Spawners;
+using Items.Data;
 
 namespace Items
 {
@@ -34,6 +36,8 @@ namespace Items
         [SerializeField] private float _epxlosionDamage;
 
         private List<Airplane> _activeAirplaneslistReference;
+        [field: SerializeField] public SpawnableItemType ItemType { get; private set; }
+
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
@@ -56,7 +60,7 @@ namespace Items
         public void StartFlight(Vector2 _direction)
         {
             direction = _direction.normalized;
-            
+
             transform.up = direction;
         }
 
@@ -96,7 +100,7 @@ namespace Items
         }
         private Vector3 GetRandomPositionAround(Vector3 center, float radius)
         {
-            Vector2 offset = Random.insideUnitCircle * radius; 
+            Vector2 offset = Random.insideUnitCircle * radius;
             return center + new Vector3(offset.x, offset.y, 0f);
         }
 
@@ -150,10 +154,74 @@ namespace Items
             yield return new WaitForSeconds(1f);
             yield return new WaitUntil(() => !IsInCameraRange(_camera));
             yield return new WaitForSeconds(1f);
-            Finish();
 
             // Літак видаляється зі списку активних літаків.
             //_activeAirplaneslistReference.Remove(this);
+            Respawn();
+        }
+        private void Respawn()
+        {
+            if (isCrashing) return;
+
+            if (TryGetSpawnPosition(out Vector3 spawnPos))
+            {
+                transform.position = spawnPos;
+            }
+            Vector3 fortressPos = _fortress.transform.position;
+            Vector2 direction =
+                (fortressPos - transform.position)
+                .normalized;
+
+            StartFlight(direction);
+            StartCoroutine(ReturnInPoolIfNotVisible());
+            isBombDropped = false;
+        }
+
+        // Скопіював зі спавнера, спагеті-код стає все смачнішим :)
+        private bool TryGetSpawnPosition(out Vector3 position)
+        {
+            Vector3 min =
+                _camera.ViewportToWorldPoint(
+                    new Vector3(0, 0));
+
+            Vector3 max =
+                _camera.ViewportToWorldPoint(
+                    new Vector3(1, 1));
+
+            int side = Random.Range(0, 4);
+
+            switch (side)
+            {
+                case 0:
+                    position = new Vector3(
+                        Random.Range(min.x, max.x),
+                        max.y + 2f);
+
+                    break;
+
+                case 1:
+                    position = new Vector3(
+                        Random.Range(min.x, max.x),
+                        min.y - 2f);
+
+                    break;
+
+                case 2:
+                    position = new Vector3(
+                        min.x - 2f,
+                        Random.Range(min.y, max.y));
+
+                    break;
+
+                default:
+                    position = new Vector3(
+                        max.x + 2f,
+                        Random.Range(min.y, max.y));
+
+                    break;
+            }
+
+            return true;
         }
 
         private bool IsInCameraRange(Camera camera)
@@ -176,7 +244,7 @@ namespace Items
         {
             get { return _activeAirplaneslistReference; }
             set { _activeAirplaneslistReference = value; }
-            
+
         }
     }
 }

@@ -4,6 +4,7 @@ public class MouseBomber : MonoBehaviour
 {
     [SerializeField] private float _radius = 1;
     private Vector2 _position;
+    [SerializeField] private AudioClip shotSound;
 
     [SerializeField] private GameObject _explosionPrefab;
     private void OnEnable()
@@ -29,6 +30,7 @@ public class MouseBomber : MonoBehaviour
             }
         }
         Instantiate(_explosionPrefab, _position, Quaternion.identity);
+        AudioSource.PlayClipAtPoint(shotSound, _position, 0.5f);
         print($"bombing {enemiesBombed.Length}");
     }
     private void OnDrawGizmos()

@@ -21,8 +21,7 @@ namespace Items.Spawners
             _activeAirplanes = activeAirplanes;
         }
 
-        protected override bool TryGetSpawnPosition(
-            out Vector3 position)
+        protected override bool TryGetSpawnPosition(out Vector3 position)
         {
             Vector3 min =
                 _camera.ViewportToWorldPoint(
@@ -68,8 +67,7 @@ namespace Items.Spawners
             return true;
         }
 
-        protected override void SetupSpawnedItem(
-            Airplane item)
+        protected override void SetupSpawnedItem(Airplane item)
         {
             /*Vector3 center =
                 _camera.ViewportToWorldPoint(
