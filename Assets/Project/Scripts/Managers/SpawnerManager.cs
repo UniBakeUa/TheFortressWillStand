@@ -64,7 +64,6 @@ namespace Managers
         }
         private void Update()
         {
-            print("6");
             if (GameStateManager.Instance.CurrentState == GameState.Playing && !_waveManager.IsStageFinished())
             {
                 foreach (var spawnerData in _spawners)

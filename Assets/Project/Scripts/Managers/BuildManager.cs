@@ -15,6 +15,7 @@ namespace Managers
         public static BuildManager Instance { get; private set; }
 
         [SerializeField] private WaterGrid _waterGrid;
+        [SerializeField] private UpgradeManager _upgradeManager;
 
         [Header("База даних будівель")]
         [SerializeField] private BuildingLibrary _buildingLibrary;
@@ -58,7 +59,7 @@ namespace Managers
         {
             // Default area config
             ChangeAreaConfig(0);
-             _moneyManager = MoneyManager.Instance;
+            _moneyManager = MoneyManager.Instance;
 
             if (GameStateManager.Instance != null)
                 GameStateManager.Instance.OnStateChange += ToggleBuildMode;
@@ -70,7 +71,7 @@ namespace Managers
                 return;
 
             _currentConfigID = configID;
-            Debug.Log("Rebuild");
+            //Debug.Log("Rebuild");
             _areaConfig = _buildingAreaConfigList[configID];
 
             InitBuildZone();
@@ -109,7 +110,7 @@ namespace Managers
 
             _firstSelectedTower = null;
 
-            BuildingConfig config = _buildingLibrary.GetConfigById(id);
+            BuildingConfig config = _buildingLibrary.GetConfigById(id) as BuildingConfig;
             if (config == null) return;
 
             if (_moneyManager.GetMoney() < config.BaseCost)
@@ -300,7 +301,7 @@ namespace Managers
             Collider2D[] hits = Physics2D.OverlapCircleAll(pos, 0.3f);
             foreach (var hit in hits)
             {
-                if (hit.GetComponentInParent<IDamageable>() != null) 
+                if (hit.GetComponentInParent<IDamageable>() != null)
                 {
                     return true;
                 }
@@ -358,9 +359,16 @@ namespace Managers
             return t;
         }
 
-        public int GetCostById(int id)
+        public int GetCostById(int id, ProductType productType)
         {
-            var config = _buildingLibrary.GetConfigById(id);
+            BuildingConfig config = null;
+
+            // Якщо ми перевіряємо ціну покращення, а не будівлі
+            if (productType == ProductType.Upgrade)
+                return _upgradeManager.GetCostById(id);
+            else
+                config = _buildingLibrary.GetConfigById(id) as BuildingConfig;
+
             return (config != null) ? config.BaseCost : 999999;
         }
 

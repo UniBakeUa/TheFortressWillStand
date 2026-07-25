@@ -47,6 +47,7 @@ namespace Items
         {
             isDead = false;
             isBombDropped = false;
+            isReachTower = false;
 
             rb.gravityScale = 0;
             rb.linearVelocity = Vector2.zero;
@@ -201,6 +202,11 @@ namespace Items
             get { return _activeEnemieslistReference; }
             set { _activeEnemieslistReference = value; }
 
+        }
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, (Vector2)transform.position + direction);
         }
     }
 }

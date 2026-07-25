@@ -11,6 +11,10 @@ namespace UI
         [SerializeField] private float _showPosition = 225f;
         [SerializeField] private float _hidePosition = -750f;
 
+        [Header("Upgrade Animation Settings")]
+        [SerializeField] private float _showUpgradePosition = 820f;
+        [SerializeField] private float _hideUpgradePosition = 1079f;
+
         [Header("Build Animation Settings")]
         [SerializeField] private float _showBuildPosition = 225f;
         [SerializeField] private float _hideBuildPosition = -750f;
@@ -18,6 +22,7 @@ namespace UI
         [Header("UI Elements")]
         [SerializeField] private TMP_Text _buttonText;
         [SerializeField] private Transform _buttonsTransform;
+        [SerializeField] private Transform _upgradesTransform;
 
         private bool _isVisible = false;
 
@@ -28,10 +33,17 @@ namespace UI
 
         private void ToggleAnimation(GameState state)
         {
-            if(state == GameState.Building)
+            if (state == GameState.Building)
+            {
                 transform.DOLocalMoveY(_showPosition, 0.5f);
+                _upgradesTransform.DOLocalMoveX(_showUpgradePosition, 0.5f);
+            }
             else
+            {
+                print(_upgradesTransform.localPosition);
                 transform.DOLocalMoveY(_hidePosition, 0.5f);
+                _upgradesTransform.DOLocalMoveX(_hideUpgradePosition, 0.5f);
+            }
         }
 
         public void ToogleHUD()

@@ -43,7 +43,7 @@ namespace UI
 
         private void Update()
         {
-            if(GameStateManager.Instance.CurrentState == GameState.Playing) return;
+            if(GameStateManager.Instance.CurrentState != GameState.Building) return;
 
             _timer -= Time.deltaTime;
             _timerSlider.value = _timer;
