@@ -26,7 +26,8 @@ namespace Towers.ScriptableObjects
                 return config;
             }
 
-            Debug.LogError($"[BuildingLibrary] Конфіг з ID {id} не знайдено! Перевір, чи додано його в BuildingLibrary.");
+            if (id != 2)
+                Debug.LogError($"[BuildingLibrary] Конфіг з ID {id} не знайдено! Перевір, чи додано його в BuildingLibrary.");
             return null;
         }
 

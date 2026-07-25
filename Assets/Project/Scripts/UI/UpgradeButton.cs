@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 using Managers;
+using Towers;
+
 namespace UI
 {
     public class UpgradeButton : MonoBehaviour
@@ -9,6 +11,7 @@ namespace UI
         [SerializeField] private TMP_Text _currentValueText;
         [SerializeField] private TMP_Text _costText;
         [SerializeField] private int _id;
+        public int Cost { get; private set; }
         private int timesUsed;
 
         public int Id { get => _id;}
@@ -17,13 +20,17 @@ namespace UI
         private void Start()
         {
             PutPercentageInAName(UpgradeManager.Instance.GetAmountOfInfluenceById(_id));
+            ChangeCost(UpgradeManager.Instance.GetCostById(Id));
+            UpgradeManager.Instance.UpdateButtonValue(_id, this);
         }
         public void PutPercentageInAName(float percentage) => _nameText.text += $" +{percentage:P0}";
-        public void ChangeCurrentValue(float number) => _currentValueText.text = number.ToString();
-        public void ChangeCostText(int number) => _costText.text = number.ToString();
-        public void Use()
+        public void ChangeCurrentValue(string value) => _currentValueText.text = value;
+        public void ChangeCost(int number)
         {
-            timesUsed++;
+            Cost = number;
+            _costText.text = Cost.ToString();
         }
+
+        public void Use() => timesUsed++;
     }
 }

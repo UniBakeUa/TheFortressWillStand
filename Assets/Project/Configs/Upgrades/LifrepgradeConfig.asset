@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ffee4e3e3def73f4c91f67d253ae61d5, type: 3}
-  m_Name: AttackRadiusConfig
+  m_Name: LifrepgradeConfig
   m_EditorClassIdentifier: 
-  <StructureName>k__BackingField: Attack Radius Increaser
-  <Id>k__BackingField: 1
-  <BaseCost>k__BackingField: 25
-  <priceChangePercentage>k__BackingField: 0.5
-  <amountOfInfluence>k__BackingField: 0.5
+  <StructureName>k__BackingField: Lifre The Game
+  <Id>k__BackingField: 2
+  <BaseCost>k__BackingField: 24
+  <priceChangePercentage>k__BackingField: 0.025
+  <amountOfInfluence>k__BackingField: 1

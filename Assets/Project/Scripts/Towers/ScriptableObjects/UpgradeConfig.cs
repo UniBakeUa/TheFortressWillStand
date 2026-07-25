@@ -6,7 +6,7 @@ namespace Towers.ScriptableObjects
     public class UpgradeConfig : ProductConfig
     {
         [Tooltip("На скільки відсотків збільшується ціна після покупки поліпшення.")]
-        [field: SerializeField, Range(0f, 100f)] public float priceChangePercentage { get; private set; }
+        [field: SerializeField, Range(0f, 1f)] public float priceChangePercentage { get; private set; }
         [Tooltip("На скільки сильно поліпшення працює у відсотках.")]
         [field: SerializeField] public float amountOfInfluence { get; private set; }
     }

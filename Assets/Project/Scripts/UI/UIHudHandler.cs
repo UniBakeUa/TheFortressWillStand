@@ -36,13 +36,13 @@ namespace UI
             if (state == GameState.Building)
             {
                 transform.DOLocalMoveY(_showPosition, 0.5f);
-                _upgradesTransform.DOLocalMoveX(_showUpgradePosition, 0.5f);
+                _upgradesTransform.DOLocalMoveX(_showUpgradePosition, 0.25f);
             }
             else
             {
                 print(_upgradesTransform.localPosition);
                 transform.DOLocalMoveY(_hidePosition, 0.5f);
-                _upgradesTransform.DOLocalMoveX(_hideUpgradePosition, 0.5f);
+                _upgradesTransform.DOLocalMoveX(_hideUpgradePosition, 0.25f);
             }
         }
 
