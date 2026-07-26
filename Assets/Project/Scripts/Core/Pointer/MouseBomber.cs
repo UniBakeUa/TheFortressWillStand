@@ -1,4 +1,5 @@
 using System.Collections;
+using Managers.Audio;
 using Towers.Buildings;
 using UnityEngine;
 
@@ -7,7 +8,6 @@ public class MouseBomber : MonoBehaviour
     [SerializeField] private float _radius = 1;
     private float _startRadius;
     private Vector2 _position;
-    [SerializeField] private AudioClip shotSound;
 
     [SerializeField] private Explosion _explosionPrefab;
 
@@ -68,7 +68,7 @@ public class MouseBomber : MonoBehaviour
         explosion.enabled = false;
         explosion.ChangeScaleModifier(_radius);
         explosion.enabled = true;
-        AudioSource.PlayClipAtPoint(shotSound, _position, 0.5f);
+        Managers.SoundManager.Instance.Play(SoundId.MouseBomberShot, _position);
         print($"bombing {enemiesBombed.Length}");
     }
     public void ModifyRadius(float amount)

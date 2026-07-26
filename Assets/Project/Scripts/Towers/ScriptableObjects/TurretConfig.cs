@@ -2,12 +2,16 @@ using Towers.Data;
 using Towers.ScriptableObjects;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Turret", menuName = "Building/Turret Config")]
-public class TurretConfig : BuildingConfig
-{ 
+[CreateAssetMenu(fileName = "GroundTurret", menuName = "Building/Ground Turret Config")]
+public class TurretConfig : BuildingConfig, IAttackRangeConfig
+{
     public int Damege;
     public float CoolDown;
-    public float AttackRange;
+    [field: SerializeField] public float AttackRange { get; private set; }
+
+    [Header("Splash")]
+    [Tooltip("Радіус ураження навколо цілі. Усі вороги в радіусі гинуть миттєво (як MouseBomber).")]
+    public float SplashRadius = 1f;
 
     [Header("Visuals")]
     public float RotationSpeed;

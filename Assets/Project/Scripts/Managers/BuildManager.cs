@@ -48,7 +48,7 @@ namespace Managers
         private LineRenderer _wallGhostLR;
         private RangeCircle _towerGhostRangeCircle;
         private bool _isShowingOtherTurretRanges;
-        private readonly List<Turret> _turretsWithVisibleRange = new();
+        private readonly List<TurretBase> _turretsWithVisibleRange = new();
 
         private ITower _firstSelectedTower;
         private MoneyManager _moneyManager;
@@ -81,6 +81,25 @@ namespace Managers
 
             InitBuildZone();
             _waterGrid.RebuildWaterGrid(_areaConfig.GridWidth, _areaConfig.GridHeight, 0.125f, _areaConfig.GridOrigin);
+        }
+
+        // Повертає індекс конфігурації з найбільшим RequiredWave, що не перевищує completedWaves.
+        public int GetAreaConfigIdForWave(int completedWaves)
+        {
+            int bestIndex = _currentConfigID >= 0 ? _currentConfigID : 0;
+            int bestRequiredWave = -1;
+
+            for (int i = 0; i < _buildingAreaConfigList.Count; i++)
+            {
+                int requiredWave = _buildingAreaConfigList[i].RequiredWave;
+                if (requiredWave <= completedWaves && requiredWave > bestRequiredWave)
+                {
+                    bestRequiredWave = requiredWave;
+                    bestIndex = i;
+                }
+            }
+
+            return bestIndex;
         }
 
         private void InitBuildZone()
@@ -173,7 +192,7 @@ namespace Managers
                 }
             }
 
-            _isShowingOtherTurretRanges = _currentBuildingConfig is TurretConfig;
+            _isShowingOtherTurretRanges = _currentBuildingConfig is IAttackRangeConfig;
             if (!_isShowingOtherTurretRanges)
             {
                 HideOtherTurretRanges();
@@ -188,7 +207,7 @@ namespace Managers
                 return;
             }
 
-            var currentTurrets = FindObjectsByType<Turret>(FindObjectsSortMode.None);
+            var currentTurrets = FindObjectsByType<TurretBase>(FindObjectsSortMode.None);
 
             foreach (var turret in currentTurrets)
             {
@@ -491,9 +510,9 @@ namespace Managers
                 _towerGhost.SetActive(_currentSelectionId >= 0);
                 _towerGhost.transform.position = ghostPos;
 
-                if (_towerGhostRangeCircle != null && _currentBuildingConfig is TurretConfig turretConfig)
+                if (_towerGhostRangeCircle != null && _currentBuildingConfig is IAttackRangeConfig rangeConfig)
                 {
-                    _towerGhostRangeCircle.Show(turretConfig.AttackRange, _ghostRangeColor);
+                    _towerGhostRangeCircle.Show(rangeConfig.AttackRange, _ghostRangeColor);
                 }
             }
 

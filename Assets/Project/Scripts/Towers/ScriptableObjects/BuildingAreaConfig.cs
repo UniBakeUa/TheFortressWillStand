@@ -23,4 +23,8 @@ public class BuildingAreaConfig : ScriptableObject
 
     [Header("Camera Options")]
     public float CameraSize;
+
+    [Header("Unlock")]
+    [Tooltip("Хвиля (CurrentLevel), після завершення якої активується цей етап. 0 = стартовий етап.")]
+    public int RequiredWave;
 }

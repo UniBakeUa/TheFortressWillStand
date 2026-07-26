@@ -29,6 +29,8 @@ namespace Core
 
         public void Return(T obj)
         {
+            if (obj == null) return;
+
             obj.gameObject.SetActive(false);
             _pool.Enqueue(obj);
         }

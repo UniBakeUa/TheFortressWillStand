@@ -1,5 +1,6 @@
 using UnityEngine;
 using Managers;
+using Managers.Audio;
 using System.Collections;
 using System.Collections.Generic;
 using Towers;
@@ -22,10 +23,6 @@ namespace Items
         [SerializeField] private float crashGravity = 3f;
         [SerializeField] private float crashRotation = 200f;
 
-        [Header("Audio")]
-        [SerializeField] private AudioClip falling;
-        [SerializeField] private AudioClip shotSound;
-        [SerializeField] private AudioClip[] voiceLines;
 
         private Rigidbody2D rb;
         private Camera _camera;
@@ -136,6 +133,7 @@ namespace Items
         private bool IsFortressInAttackRange()
         {
             if (Fortress == null) return false;
+            if (!IsInCameraRange(_camera, _attackVisibilityMargin)) return false;
 
             Vector2 myPos = transform.position;
             Vector2 fortressPos = Fortress.transform.position;
@@ -211,9 +209,22 @@ namespace Items
             if (_targetWall != null)
             {
                 Vector2 wallTarget = Vector2.Lerp(_targetWall.NodeAPosition, _targetWall.NodeBPosition, 0.5f);
+                bool inAttackDistance = Vector2.Distance(myPos, wallTarget) <= _effectiveAttackDistance;
+
+                if (inAttackDistance && !IsInCameraRange(_camera, _attackVisibilityMargin))
+                {
+                    // Дійшов на AttackDistance до стіни, але поза кадром - йдемо
+                    // ближче, повз точку атаки, у бік самої стіни, поки не
+                    // потрапимо у видиму зону. wallTarget - це вже edge-точка на
+                    // самій стіні, тож лінія до неї природно "блокується" стіною-
+                    // ціллю; перевіряти тут IsBlocked нема сенсу (завжди true).
+                    MoveTowards(wallTarget);
+                    return;
+                }
+
                 MoveTowards(wallTarget);
 
-                if (Vector2.Distance(myPos, wallTarget) <= _effectiveAttackDistance)
+                if (inAttackDistance && IsInCameraRange(_camera, _attackVisibilityMargin))
                 {
                     isReachTower = true;
                     _attackTargetPosition = wallTarget;
@@ -230,7 +241,23 @@ namespace Items
 
             bool isFinalWaypoint = _currentWaypointIndex == _currentPath.Count - 1;
             Vector2 waypoint = _currentPath[_currentWaypointIndex];
-            MoveTowards(waypoint);
+
+            bool reachedThrowPoint = isFinalWaypoint && Vector2.Distance(myPos, waypoint) <= _waypointReachDistance;
+
+            // Дійшов до throw-точки, але поза кадром - атакувати поза камерою
+            // заборонено, тож йдемо ще ближче (за AttackDistance) до фортеці,
+            // поки не потрапимо у видиму зону. Рухаємось тільки якщо лінія до
+            // фортеці вільна - інакше лишаємось на waypoint і чекаємо на
+            // звичний stuck-таймер нижче, щоб не застрягти назавжди.
+            if (reachedThrowPoint && !IsInCameraRange(_camera, _attackVisibilityMargin)
+                && !EnemyPathfinder.IsBlocked(myPos, Fortress.transform.position, _wallMask))
+            {
+                MoveTowards(Fortress.transform.position);
+            }
+            else
+            {
+                MoveTowards(waypoint);
+            }
 
             // Остання точка шляху - це throw-точка на AttackDistance від фортеці.
             // Її "досягнутість" перевіряємо через реальну відстань до фортеці
@@ -239,11 +266,12 @@ namespace Items
             // з трохи іншим кутом підходу щокадру, і ворога хаотично розвертає.
             if (isFinalWaypoint)
             {
-                if (Vector2.Distance(myPos, waypoint) <= _waypointReachDistance)
+                if (reachedThrowPoint)
                 {
                     // Дійшов до throw-точки, але Update ще не підтвердив атаку -
-                    // ймовірно лінія до фортеці звідси заблокована. Форсуємо
-                    // перерахунок шляху після короткого таймауту, щоб не застрягти.
+                    // ймовірно лінія до фортеці звідси заблокована, або ворог
+                    // ще не потрапив у видиму зону камери. Форсуємо перерахунок
+                    // шляху після короткого таймауту, щоб не застрягти.
                     _stuckAtFinalWaypointTimer += Time.deltaTime;
                     if (_stuckAtFinalWaypointTimer >= 0.3f)
                     {
@@ -330,6 +358,8 @@ namespace Items
 
             _attackTargetPosition = targetPosition;
 
+            if (!IsInCameraRange(_camera, _attackVisibilityMargin)) return;
+
             float currentDelay = hasAttackedOnce ? attackDelay : firstAttackDelay;
             if (timeSinceLastAttack >= currentDelay)
             {
@@ -358,7 +388,7 @@ namespace Items
             if (isDead) yield break;
 
             SetFiring(false);
-            AudioSource.PlayClipAtPoint(shotSound, transform.position, 0.5f);
+            SoundManager.Instance.Play(SoundId.EnemyGrenadeThrow, transform.position);
 
             bool isWallTarget = _targetWall != null;
             Wall wallTarget = _targetWall;
@@ -371,6 +401,7 @@ namespace Items
         {
             isGrenadeInFlight = false;
             Instantiate(_explosionPrefab, impactPosition, Quaternion.identity);
+            SoundManager.Instance.Play(SoundId.EnemyGrenadeExplosion, impactPosition);
 
             if (isWallTarget)
             {
@@ -435,13 +466,11 @@ namespace Items
 
         private void PlayFallingAudio()
         {
-            AudioSource.PlayClipAtPoint(falling, transform.position);
-
+            SoundManager.Instance.Play(SoundId.EnemyFalling, transform.position);
 
             if (Random.Range(0, 3) != 0) return;
 
-            int x = Random.Range(0, voiceLines.Length);
-            AudioSource.PlayClipAtPoint(voiceLines[x], transform.position);
+            SoundManager.Instance.Play(SoundId.EnemyVoice, transform.position);
         }
 
         private IEnumerator ReturnInPoolIfNotVisible()
@@ -455,12 +484,14 @@ namespace Items
             }
         }
 
-        private bool IsInCameraRange(Camera camera)
+        [SerializeField, Range(0f, 0.49f)] private float _attackVisibilityMargin = 0.05f;
+
+        private bool IsInCameraRange(Camera camera, float viewportMargin = 0f)
         {
             Vector3 viewportPos = camera.WorldToViewportPoint(transform.position);
 
-            return viewportPos.x >= 0 && viewportPos.x <= 1 &&
-                   viewportPos.y >= 0 && viewportPos.y <= 1 &&
+            return viewportPos.x >= viewportMargin && viewportPos.x <= 1f - viewportMargin &&
+                   viewportPos.y >= viewportMargin && viewportPos.y <= 1f - viewportMargin &&
                    viewportPos.z > 0;
 
         }

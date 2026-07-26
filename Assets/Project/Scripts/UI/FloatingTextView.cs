@@ -41,6 +41,7 @@ namespace UI
 
             sequence.OnComplete(() =>
             {
+                if (this == null) return;
                 onCompleteAction?.Invoke(this);
             });
         }

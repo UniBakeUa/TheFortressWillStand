@@ -28,9 +28,9 @@ public class GameStateManager : MonoBehaviour
 
     private void CheckForAreaChanges(GameState newState)
     {
-        if (_waveManager.CurrentLevel > 6 && newState == GameState.Building)
-        {
-            BuildManager.Instance.ChangeAreaConfig(1);
-        }
+        if (newState != GameState.Building) return;
+
+        int targetConfigID = BuildManager.Instance.GetAreaConfigIdForWave(_waveManager.CurrentLevel);
+        BuildManager.Instance.ChangeAreaConfig(targetConfigID);
     }
 }

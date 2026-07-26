@@ -1,3 +1,4 @@
+using Towers.Buildings;
 using UnityEngine;
 
 namespace Managers
@@ -6,13 +7,13 @@ namespace Managers
     {
         [SerializeField] private float _hoverRadius = 0.7f;
 
-        private Turret _hoveredTurret;
+        private TurretBase _hoveredTurret;
 
         private void Update()
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            Turret closest = FindClosestTurret(mousePos);
+            TurretBase closest = FindClosestTurret(mousePos);
 
             if (closest != _hoveredTurret)
             {
@@ -30,11 +31,11 @@ namespace Managers
             }
         }
 
-        private Turret FindClosestTurret(Vector2 point)
+        private TurretBase FindClosestTurret(Vector2 point)
         {
-            var turrets = FindObjectsByType<Turret>(FindObjectsSortMode.None);
+            var turrets = FindObjectsByType<TurretBase>(FindObjectsSortMode.None);
 
-            Turret closest = null;
+            TurretBase closest = null;
             float closestSqrDistance = _hoverRadius * _hoverRadius;
 
             foreach (var turret in turrets)

@@ -15,12 +15,13 @@ MonoBehaviour:
   SnapRadius: 0.5
   MinBuildX: 3
   MaxBuildX: 17
-  MinBuildY: 3
-  MaxBuildY: 14
+  MinBuildY: 3.5
+  MaxBuildY: 12.5
   SandScale: {x: 24.6156, y: 17.3233}
   SandPosition: {x: 11.8078, y: 8.1616, z: 0}
   GridWidth: 200
-  GridHeight: 128
+  GridHeight: 200
   GridOrigin: {x: 0, y: 0}
   RisingTime: 3.5
   CameraSize: 6.43
+  RequiredWave: 0

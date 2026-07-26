@@ -1,3 +1,5 @@
+using Managers;
+using Managers.Audio;
 using UI;
 using UI.Factories;
 using UnityEngine;
@@ -17,8 +19,6 @@ namespace Items
         [SerializeField] private float maxForce = 8f;
         [SerializeField] private float sideForceRange = 2f; // �������� ������ ���
         [SerializeField] private float rotationSpeed = 100f;
-
-        [SerializeField] private AudioClip _audioClip;
 
         private Rigidbody2D _rb;
         private float _timer;
@@ -50,7 +50,7 @@ namespace Items
 
         private void OnEnable()
         {
-            AudioSource.PlayClipAtPoint(_audioClip, transform.position);
+            SoundManager.Instance.Play(SoundId.PonchicSpawn, transform.position);
             InitForce();
             _timer = 0f;
         }

@@ -18,6 +18,44 @@ namespace Items
         private const float DetourOffset = 0.6f;
         private const int CircleDetourPoints = 8;
 
+        // Граф перешкод (стіни/вежі/турелі) однаковий для всіх ворогів одночасно -
+        // раніше AddAllObstacleDetourNodes і FindObjectsByType виконувались окремо
+        // для кожного ворога щоразу при перерахунку шляху (сотні викликів на кадр
+        // при десятках ворогів). Кешуємо один раз, інвалідуємо тільки коли граф
+        // справді змінився (побудова/руйнування стіни чи вежі).
+        private static List<Wall> _cachedWalls;
+        private static List<Vector2> _cachedDetourNodes;
+        private static bool _cacheDirty = true;
+
+        public static void InvalidateCache() => _cacheDirty = true;
+
+        private static void EnsureCacheBuilt()
+        {
+            if (!_cacheDirty) return;
+
+            _cachedWalls = new List<Wall>(Object.FindObjectsByType<Wall>(FindObjectsSortMode.None));
+            _cachedDetourNodes = new List<Vector2>();
+
+            foreach (var wall in _cachedWalls)
+            {
+                AddDetourNodes(wall.NodeAPosition, wall.NodeBPosition, _cachedDetourNodes);
+            }
+
+            Tower[] towers = Object.FindObjectsByType<Tower>(FindObjectsSortMode.None);
+            foreach (var tower in towers)
+            {
+                AddCircleDetourNodes(tower.transform.position, tower.ObstacleRadius, _cachedDetourNodes);
+            }
+
+            TurretBase[] turrets = Object.FindObjectsByType<TurretBase>(FindObjectsSortMode.None);
+            foreach (var turret in turrets)
+            {
+                AddCircleDetourNodes(turret.transform.position, turret.ObstacleRadius, _cachedDetourNodes);
+            }
+
+            _cacheDirty = false;
+        }
+
         public static bool TryFindPath(Vector2 start, Vector2 fortressPos, float attackDistance, LayerMask wallMask, out List<Vector2> path, out float pathLength)
         {
             path = null;
@@ -97,23 +135,8 @@ namespace Items
         /// </summary>
         private static void AddAllObstacleDetourNodes(List<Vector2> nodes)
         {
-            Wall[] walls = Object.FindObjectsByType<Wall>(FindObjectsSortMode.None);
-            foreach (var wall in walls)
-            {
-                AddDetourNodes(wall.NodeAPosition, wall.NodeBPosition, nodes);
-            }
-
-            Tower[] towers = Object.FindObjectsByType<Tower>(FindObjectsSortMode.None);
-            foreach (var tower in towers)
-            {
-                AddCircleDetourNodes(tower.transform.position, tower.ObstacleRadius, nodes);
-            }
-
-            Turret[] turrets = Object.FindObjectsByType<Turret>(FindObjectsSortMode.None);
-            foreach (var turret in turrets)
-            {
-                AddCircleDetourNodes(turret.transform.position, turret.ObstacleRadius, nodes);
-            }
+            EnsureCacheBuilt();
+            nodes.AddRange(_cachedDetourNodes);
         }
 
         private static void AddCircleDetourNodes(Vector2 center, float radius, List<Vector2> nodes)
@@ -128,13 +151,14 @@ namespace Items
 
         public static Wall FindNearestBlockingWall(Vector2 from, Vector2 fortressPos, LayerMask wallMask)
         {
-            Wall[] walls = Object.FindObjectsByType<Wall>(FindObjectsSortMode.None);
+            EnsureCacheBuilt();
 
             Wall nearest = null;
             float nearestSqrDistance = float.MaxValue;
 
-            foreach (var wall in walls)
+            foreach (var wall in _cachedWalls)
             {
+                if (wall == null) continue;
                 if (!SegmentsIntersect(from, fortressPos, wall.NodeAPosition, wall.NodeBPosition)) continue;
 
                 Vector2 midpoint = (wall.NodeAPosition + wall.NodeBPosition) * 0.5f;

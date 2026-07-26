@@ -129,7 +129,8 @@ MonoBehaviour:
   crashGravity: 3
   crashRotation: 350
   falling: {fileID: 8300000, guid: b0d08f9994a8aa7418a969b0825840c5, type: 3}
-  shotSound: {fileID: 8300000, guid: 711423df82341e645861e3323eb84fd2, type: 3}
+  shotSound: {fileID: 8300000, guid: 8346c142b212f384fa3b6dbf70b5da37, type: 3}
+  explosionSound: {fileID: 8300000, guid: 08677f21ec19b8949be6de51e46a3b0e, type: 3}
   voiceLines:
   - {fileID: 8300000, guid: b440a9d704d5d8e47857a9558d544835, type: 3}
   - {fileID: 8300000, guid: 6f51839fbe748e74897d3590cd959cbe, type: 3}

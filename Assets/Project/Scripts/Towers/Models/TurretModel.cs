@@ -7,6 +7,7 @@ namespace Towers.Models
         public float CoolDown { get; private set; }
         public float AttackRange { get; private set; }
         public float RotationSpeed { get; private set; }
+        public float SplashRadius { get; private set; }
 
         public TurretModel(TurretConfig buildingConfig) : base(buildingConfig)
         {
@@ -14,6 +15,7 @@ namespace Towers.Models
             CoolDown = buildingConfig.CoolDown;
             RotationSpeed = buildingConfig.RotationSpeed;
             AttackRange = buildingConfig.AttackRange;
+            SplashRadius = buildingConfig.SplashRadius;
         }
     }
 }

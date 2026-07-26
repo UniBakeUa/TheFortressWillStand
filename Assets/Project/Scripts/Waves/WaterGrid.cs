@@ -95,6 +95,8 @@ namespace Waves
 
             _dynamicInjectedLevel = defaultWaterLevel;
             _currentDamping = dampNormal;
+            _hasActiveZone = false;
+            _renderTexDirty = true;
 
             OnGridRebuilt?.Invoke();
 
@@ -311,10 +313,26 @@ namespace Waves
 
         [SerializeField, Range(0.05f, 0.49f)] public float waveSpeedSq = 0.4f;
 
+        // Активна зона симуляції по X - клітинки поза нею вважаються осілими
+        // (рівень води == рельєф, лапласіан там усе одно ~0) і не рахуються.
+        // Межі щокадру перераховуються за фактично "неспокійними" клітинками
+        // попереднього кроку, тож якість хвилі не змінюється - рахуємо менше
+        // клітинок замість спрощення самої фізики.
+        [SerializeField] private float _activeCellSettleThreshold = 0.02f;
+        private const int ActiveZoneMargin = 2;
+        private int _activeMinX, _activeMaxX;
+        private bool _hasActiveZone;
+
         void Step()
         {
+            int scanMinX = _hasActiveZone ? Mathf.Max(0, _activeMinX - ActiveZoneMargin) : 0;
+            int scanMaxX = _hasActiveZone ? Mathf.Min(width - 1, _activeMaxX + ActiveZoneMargin) : width - 1;
+
+            int nextMinX = width;
+            int nextMaxX = -1;
+
             for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++)
+            for (int x = scanMinX; x <= scanMaxX; x++)
             {
                 int i = Idx(x, y);
                 if (_solid[i]) { _bufA[i] = 0f; _bufB[i] = 0f; continue; }
@@ -333,8 +351,53 @@ namespace Waves
                     newH += flowX * 0.5f;
                 }
 
-                _bufA[i] = Mathf.Clamp(newH * _currentDamping, 0, 10f);
+                newH = Mathf.Clamp(newH * _currentDamping, 0, 10f);
+                _bufA[i] = newH;
+
+                if (Mathf.Abs(newH - _terrainHeight[i]) > _activeCellSettleThreshold)
+                {
+                    if (x < nextMinX) nextMinX = x;
+                    if (x > nextMaxX) nextMaxX = x;
+                }
             }
+
+            // Поза просканованою зоною вода вважається осілою на рівні рельєфу -
+            // тримаємо буфери синхронними, інакше на межі зони з'явиться "сходинка".
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < scanMinX; x++)
+                {
+                    int i = Idx(x, y);
+                    if (!_solid[i]) _bufA[i] = _terrainHeight[i];
+                }
+                for (int x = scanMaxX + 1; x < width; x++)
+                {
+                    int i = Idx(x, y);
+                    if (!_solid[i]) _bufA[i] = _terrainHeight[i];
+                }
+            }
+
+            // Хвиля постійно вливається біля правого краю (InjectWaterAtRightEdge) -
+            // поки йде інʼєкція, права межа активної зони має включати цю ділянку,
+            // інакше свіжовлита вода одразу відкидається як "осіла".
+            if (_waveCoroutine != null)
+            {
+                int injectStartX = Mathf.FloorToInt(width * 0.7f);
+                if (injectStartX < nextMinX) nextMinX = injectStartX;
+                if (width - 1 > nextMaxX) nextMaxX = width - 1;
+            }
+
+            if (nextMaxX >= nextMinX)
+            {
+                _activeMinX = nextMinX;
+                _activeMaxX = nextMaxX;
+                _hasActiveZone = true;
+            }
+            else
+            {
+                _hasActiveZone = false;
+            }
+
             (_bufA, _bufB) = (_bufB, _bufA);
         }
         
@@ -423,14 +486,26 @@ namespace Waves
 
         // ФІКС: раніше перший if логував помилку і виходив з методу ДО того, як текстура
         // встигала створитись - _renderTex залишався null назавжди, помилка спамилась щокадру
+        private bool _renderTexDirty = true;
+
         void LateUpdate()
         {
+            bool needsFullUpload = _renderTex == null || _renderTexDirty;
+
             if (_renderTex == null)
                 _renderTex = new Texture2D(width, height, TextureFormat.RFloat, false);
 
-            var raw = _renderTex.GetRawTextureData<float>();
-            for (int i = 0; i < _bufA.Length; i++) raw[i] = _solid[i] ? 0f : _bufA[i];
-            _renderTex.Apply();
+            // Поки є активна хвиля, вода реально змінюється - текстуру треба лити щокадру.
+            // Коли хвилі немає (_hasActiveZone == false), Step() нічого не рахував і
+            // _bufA не змінився відносно попереднього кадру - переписувати всю
+            // текстуру нема сенсу, досить один раз "дописати" останній стан.
+            if (needsFullUpload || _hasActiveZone)
+            {
+                var raw = _renderTex.GetRawTextureData<float>();
+                for (int i = 0; i < _bufA.Length; i++) raw[i] = _solid[i] ? 0f : _bufA[i];
+                _renderTex.Apply();
+                _renderTexDirty = false;
+            }
 
             Shader.SetGlobalTexture(WaterHeightTexID, _renderTex);
             Shader.SetGlobalVector(WaterGridOriginID, origin);

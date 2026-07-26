@@ -175,7 +175,7 @@ namespace Towers.Buildings
                 _graph.RemoveWall(new WallLink { A = _nodeA, B = _nodeB });
             }
 
-            Destroy(gameObject);
+            base.Collapse();
         }
 
         private IEnumerator WallSpawnRoutine(float duration)

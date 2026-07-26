@@ -21,5 +21,6 @@ MonoBehaviour:
   <GhostPrefab>k__BackingField: {fileID: 4696339223599300327, guid: 69d0ca05f4908614b951cdfa14f57bac, type: 3}
   Damege: 10
   CoolDown: 3.5
-  AttackRange: 5
+  <AttackRange>k__BackingField: 5
+  SplashRadius: 1
   RotationSpeed: 20

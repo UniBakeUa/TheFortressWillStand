@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Managers;
+using Managers.Audio;
 using System.Collections;
 using Towers;
 using System.Collections.Generic;
@@ -14,14 +15,13 @@ namespace Items
     {
         [SerializeField] private float speed = 3f;
 
+        [Header("Health")]
+        [SerializeField] private int maxHP = 10;
+        private int currentHP;
+
         [Header("Physics")]
         [SerializeField] private float crashGravity = 3f;
         [SerializeField] private float crashRotation = 200f;
-
-        [Header("Audio")]
-        [SerializeField] private AudioClip falling;
-        [SerializeField] private AudioClip bombing;
-        [SerializeField] private AudioClip[] voiceLines;
 
         private Rigidbody2D rb;
         private Camera _camera;
@@ -49,6 +49,7 @@ namespace Items
         {
             isCrashing = false;
             isBombDropped = false;
+            currentHP = maxHP;
 
             rb.gravityScale = 0;
             rb.linearVelocity = Vector2.zero;
@@ -97,7 +98,7 @@ namespace Items
         {
             isBombDropped = true;
             Instantiate(_explosionPrefab, GetRandomPositionAround(Fortress.transform.position, 0.3f), Quaternion.identity);
-            AudioSource.PlayClipAtPoint(bombing, Fortress.transform.position, 0.5f);
+            SoundManager.Instance.Play(SoundId.PlaneBombExplosion, Fortress.transform.position);
             _fortress.GetComponentInParent<IDamageable>().TakeDamage(_epxlosionDamage);
         }
         private Vector3 GetRandomPositionAround(Vector3 center, float radius)
@@ -140,15 +141,24 @@ namespace Items
             Collect();
         }
 
+        public void TakeHit(int damage)
+        {
+            if (isCrashing) return;
+
+            currentHP -= damage;
+            if (currentHP <= 0)
+            {
+                Collect();
+            }
+        }
+
         private void PlayFallingAudio()
         {
-            AudioSource.PlayClipAtPoint(falling, transform.position);
-
+            SoundManager.Instance.Play(SoundId.PlaneFalling, transform.position);
 
             if (Random.Range(0, 3) != 0) return;
 
-            int x = Random.Range(0, voiceLines.Length);
-            AudioSource.PlayClipAtPoint(voiceLines[x], transform.position);
+            SoundManager.Instance.Play(SoundId.PlaneVoice, transform.position);
         }
 
         private IEnumerator ReturnInPoolIfNotVisible()

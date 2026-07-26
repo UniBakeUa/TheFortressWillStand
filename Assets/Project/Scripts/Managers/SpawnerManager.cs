@@ -81,6 +81,21 @@ namespace Managers
                     }
                 }
             }
+
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                SpawnTestEnemies(10);
+            }
+        }
+
+        private void SpawnTestEnemies(int count)
+        {
+            if (!_spawners.TryGetValue(SpawnableItemType.Enemy, out ISpawner spawner)) return;
+
+            for (int i = 0; i < count; i++)
+            {
+                spawner.SpawnNow();
+            }
         }
 
         public List<Airplane> ActiveAirplanes => _activeAirplanes;

@@ -12,7 +12,10 @@ namespace UI
         {
             if (_superSecretSprites.Count == 0) return;
 
-            int randomSpriteIndex = Random.Range(0, _superSecretSprites.Count - 1);
+            int randomSpriteIndex = Random.Range(0, _superSecretSprites.Count);
+            Sprite sprite = _superSecretSprites[randomSpriteIndex];
+            if (sprite == null || Camera.main == null) return;
+
             Vector3 viewportPoint = new Vector3(Random.value, Random.value, Camera.main.nearClipPlane);
 
             Vector3 worldPoint = Camera.main.ViewportToWorldPoint(viewportPoint);
@@ -25,8 +28,8 @@ namespace UI
             obj.layer = LayerMask.NameToLayer("UI");
 
             Image image = obj.AddComponent<Image>();
-            image.sprite = _superSecretSprites[randomSpriteIndex];
-            image.rectTransform.sizeDelta = image.sprite.rect.size / 10;
+            image.sprite = sprite;
+            image.rectTransform.sizeDelta = sprite.rect.size / 10;
             image.rectTransform.Rotate(0, 0, Random.Range(0, 360));
             image.raycastTarget = false;
         }

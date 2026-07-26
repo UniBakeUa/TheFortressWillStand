@@ -37,6 +37,14 @@ namespace Items.Spawners
             }
         }
 
+        public void SpawnNow()
+        {
+            if (TryGetSpawnPosition(out Vector3 spawnPos))
+            {
+                SpawnItem(spawnPos);
+            }
+        }
+
         private void SpawnItem(Vector3 position)
         {
             T item = pool.Get();

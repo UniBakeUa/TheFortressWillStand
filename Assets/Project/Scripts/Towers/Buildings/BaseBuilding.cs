@@ -57,6 +57,12 @@ namespace Towers.Buildings
             IsReady = true;
             RegisterFootprint();
             PlaySpawnAnimation();
+
+            // Нова будівля могла з'явитись на шляху ворогів (вежа/турель - точкова
+            // перешкода для pathfinder-графа) - інвалідуємо кеш, щоб наступний
+            // перерахунок шляху враховував її. Wall.Collapse() інвалідує окремо
+            // при руйнуванні, тут - тільки поява нової перешкоди.
+            Items.EnemyPathfinder.InvalidateCache();
         }
 
         protected virtual void RegisterFootprint()
@@ -104,6 +110,8 @@ namespace Towers.Buildings
         {
             if (WaterGrid != null)
                 WaterGrid.UnregisterObstacle(transform.position, _registeredRadius);
+
+            Items.EnemyPathfinder.InvalidateCache();
 
             Destroy(gameObject);
         }
