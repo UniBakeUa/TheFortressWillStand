@@ -125,14 +125,16 @@ MonoBehaviour:
   speed: 0.15
   AttackDistance: 4.2
   damage: 12
-  attackDelay: 4
+  attackDelay: 20
   crashGravity: 3
   crashRotation: 350
   falling: {fileID: 8300000, guid: b0d08f9994a8aa7418a969b0825840c5, type: 3}
+  shotSound: {fileID: 0}
   voiceLines:
   - {fileID: 8300000, guid: b440a9d704d5d8e47857a9558d544835, type: 3}
   - {fileID: 8300000, guid: 6f51839fbe748e74897d3590cd959cbe, type: 3}
   _explosionPrefab: {fileID: 5717577051735948075, guid: 4bc825b1ec021e744981813233d0aad4, type: 3}
+  _grenadePrefab: {fileID: 2876441665723923219, guid: 86c6635e766ff5e468590db7f1d72db1, type: 3}
 --- !u!1 &4387624909449761327
 GameObject:
   m_ObjectHideFlags: 0

@@ -1320,7 +1320,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -139.78998, y: 46.410004}
+  m_AnchoredPosition: {x: -139.78992, y: 46.410034}
   m_SizeDelta: {x: 279.59, y: -427.02}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &289299733
@@ -1688,7 +1688,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 2068589431
-  m_SortingOrder: 0
+  m_SortingOrder: 200
   m_TargetDisplay: 0
 --- !u!224 &475435045
 RectTransform:
@@ -2112,6 +2112,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 6666090948191891131}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2119,6 +2120,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &6666090948191891131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5439c189a9d2447188085d41afdf6e24, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  _duration: 0.2
+  _magnitude: 0.15
 --- !u!81 &519420029
 AudioListener:
   m_ObjectHideFlags: 0
@@ -2550,8 +2565,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u0420\u0415\u041C\u041E\u041D\u0422"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5f884d96566a74a48b86bfb8c343740a, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 5f884d96566a74a48b86bfb8c343740a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2908,8 +2923,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u0414\u0420\u0418\u041B\u042C"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5f884d96566a74a48b86bfb8c343740a, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 5f884d96566a74a48b86bfb8c343740a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4026,8 +4041,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u0422\u0423\u0420\u0415\u041B\u042C"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5f884d96566a74a48b86bfb8c343740a, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 5f884d96566a74a48b86bfb8c343740a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4250,8 +4265,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c6e043638d87dd9499a32cc14a907e08, type: 3}
   - {fileID: 21300000, guid: 06caae0da1226ed48805c9c9e09f878c, type: 3}
   - {fileID: 21300000, guid: b07d02a480e8c064eab56b218fde95da, type: 3}
-  _paddingX: 0
-  _paddingY: 0
 --- !u!1 &891543901
 GameObject:
   m_ObjectHideFlags: 0
@@ -4677,8 +4690,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u0421\u0422\u0406\u041D\u0410\n"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5f884d96566a74a48b86bfb8c343740a, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 5f884d96566a74a48b86bfb8c343740a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6814,7 +6827,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 1147246917
-  m_SortingOrder: 0
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!224 &1413007637
 RectTransform:
@@ -9520,8 +9533,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u0420\u0406\u0412"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5f884d96566a74a48b86bfb8c343740a, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 5f884d96566a74a48b86bfb8c343740a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

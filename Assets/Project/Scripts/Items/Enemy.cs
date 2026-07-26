@@ -12,7 +12,9 @@ namespace Items
         [SerializeField] private float AttackDistance = 3f;
         [SerializeField] private float damage;
         [SerializeField] private float attackDelay = 1f;
-        private float timeSinceLastAttack = 1f;
+        [SerializeField] private float firstAttackDelay = 2f;
+        private float timeSinceLastAttack;
+        private bool hasAttackedOnce;
 
         [Header("Physics")]
         [SerializeField] private float crashGravity = 3f;
@@ -31,10 +33,11 @@ namespace Items
 
         private bool isDead;
         private bool isReachTower;
-        private bool isBombDropped = false;
+        private bool isGrenadeInFlight;
 
         [Header("Explosion")]
         [SerializeField] private GameObject _explosionPrefab;
+        [SerializeField] private Grenade _grenadePrefab;
 
         private List<Enemy> _activeEnemieslistReference;
         private void Awake()
@@ -46,8 +49,10 @@ namespace Items
         private void OnEnable()
         {
             isDead = false;
-            isBombDropped = false;
+            isGrenadeInFlight = false;
             isReachTower = false;
+            hasAttackedOnce = false;
+            timeSinceLastAttack = 0f;
 
             rb.gravityScale = 0;
             rb.linearVelocity = Vector2.zero;
@@ -90,12 +95,13 @@ namespace Items
 
         private void CheckForDropBomb()
         {
-            if (Fortress != null && !isBombDropped && Vector3.Distance(transform.position, Fortress.transform.position) <= AttackDistance)
+            if (Fortress != null && !isGrenadeInFlight && Vector3.Distance(transform.position, Fortress.transform.position) <= AttackDistance)
             {
                 isReachTower = true;
-                if (timeSinceLastAttack >= attackDelay)
+                float currentDelay = hasAttackedOnce ? attackDelay : firstAttackDelay;
+                if (timeSinceLastAttack >= currentDelay)
                 {
-                    CreateExplosionInTheFortress();
+                    ThrowGrenadeAtFortress();
                     timeSinceLastAttack = 0f;
                 }
                 else
@@ -105,11 +111,21 @@ namespace Items
             }
         }
 
-        private void CreateExplosionInTheFortress()
+        private void ThrowGrenadeAtFortress()
         {
-            isBombDropped = true;
-            Instantiate(_explosionPrefab, GetRandomPositionAround(Fortress.transform.position, 0.4f), Quaternion.identity);
-            AudioSource.PlayClipAtPoint(shotSound, Fortress.transform.position, 0.5f);
+            isGrenadeInFlight = true;
+            hasAttackedOnce = true;
+            AudioSource.PlayClipAtPoint(shotSound, transform.position, 0.5f);
+
+            Vector3 impactPosition = GetRandomPositionAround(Fortress.transform.position, 0.4f);
+            var grenade = Instantiate(_grenadePrefab, transform.position, Quaternion.identity);
+            grenade.Launch(impactPosition, () => CreateExplosionInTheFortress(impactPosition));
+        }
+
+        private void CreateExplosionInTheFortress(Vector3 impactPosition)
+        {
+            isGrenadeInFlight = false;
+            Instantiate(_explosionPrefab, impactPosition, Quaternion.identity);
             _fortress.GetComponentInParent<IDamageable>().TakeDamage(damage);
         }
         private Vector3 GetRandomPositionAround(Vector3 center, float radius)
