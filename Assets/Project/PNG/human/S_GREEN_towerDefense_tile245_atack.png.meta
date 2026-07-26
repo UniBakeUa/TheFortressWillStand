@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: db3183033945962418e85cde5b26f29f
+guid: 6fd2ecfe1fcc88242aef672e1dc21f50
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2736629001990200312
-    second: towerDefense_tile248_0
+      213: 7133782965717835721
+    second: towerDefense_tile245_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,27 +96,40 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: towerDefense_tile248_0
+      name: towerDefense_tile245_0
       rect:
         serializedVersion: 2
-        x: 39
-        y: 35
-        width: 50
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 21
+        y: 1
+        width: 68
+        height: 92
+      alignment: 9
+      pivot: {x: 0.6206433, y: 0.67597467}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8fb58a9f3957af520800000000000000
-      internalID: 2736629001990200312
+      spriteID: 9cf18589fc9400360800000000000000
+      internalID: 7133782965717835721
       vertices: []
       indices: 
       edges: []
@@ -125,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 58adf2b6bfbae9642af97a6d54f852c7
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      towerDefense_tile248_0: 2736629001990200312
+      towerDefense_tile245_0: 7133782965717835721
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

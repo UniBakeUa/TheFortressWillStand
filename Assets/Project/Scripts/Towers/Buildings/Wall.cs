@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Towers.Buildings
 {
     [RequireComponent(typeof(LineRenderer), typeof(EdgeCollider2D))]
-    public class Wall : BaseBuilding, IWall
+    public class Wall : BaseBuilding, IWall, IDamageFlashTarget
     {
         private TowerNode _nodeA;
         private TowerNode _nodeB;
@@ -14,7 +14,20 @@ namespace Towers.Buildings
         private LineRenderer _lineRenderer;
         private WallStrengthCalculator _strengthCalc;
 
+        [Header("Ефект пошкодження")]
+        [SerializeField] private Color _hitFlashColor = Color.red;
+        [SerializeField] private float _hitAnimationDuration = 0.05f;
+        [SerializeField] private float _hitShakeOffset = 0.05f;
+
+        private Color _originalLineColor;
+        private Vector2 _shakeOffset;
+        private float _lastKnownHP;
+        private Coroutine _hitRoutine;
+
         public WallModel WallModel;
+
+        public Vector2 NodeAPosition => _nodeA.Position;
+        public Vector2 NodeBPosition => _nodeB.Position;
 
         protected override float ErosionRate
         {
@@ -44,6 +57,47 @@ namespace Towers.Buildings
                 _buildingView.SetupHealth(Model.MaxHP);
                 Model.OnHealthChanged += _buildingView.UpdateHealth;
             }
+
+            _originalLineColor = _lineRenderer.startColor;
+            _lastKnownHP = Model.CurrentHP;
+            Model.OnHealthChanged += OnHealthChanged;
+        }
+
+        private void OnHealthChanged(float currentHP)
+        {
+            if (currentHP < _lastKnownHP)
+            {
+                _hitRoutine = DamageFlashEffect.Play(
+                    this, this, _hitRoutine, _hitFlashColor, _hitAnimationDuration, _hitAnimationDuration, _hitShakeOffset,
+                    onComplete: () => _hitRoutine = null);
+            }
+            _lastKnownHP = currentHP;
+        }
+
+        public void SetFlashColor(Color color)
+        {
+            _lineRenderer.startColor = color;
+            _lineRenderer.endColor = color;
+        }
+
+        public void ResetColor()
+        {
+            _lineRenderer.startColor = _originalLineColor;
+            _lineRenderer.endColor = _originalLineColor;
+        }
+
+        public void Shake(Vector2 offset)
+        {
+            _shakeOffset = offset;
+            _lineRenderer.SetPosition(0, _nodeA.Position + _shakeOffset);
+            _lineRenderer.SetPosition(1, _nodeB.Position + _shakeOffset);
+        }
+
+        public void ResetPosition()
+        {
+            _shakeOffset = Vector2.zero;
+            _lineRenderer.SetPosition(0, _nodeA.Position);
+            _lineRenderer.SetPosition(1, _nodeB.Position);
         }
 
         public void Init(TowerNode a, TowerNode b, FortificationGraph fortGraph, WallStrengthCalculator wallStrengthCalc)
@@ -61,6 +115,14 @@ namespace Towers.Buildings
 
             transform.position = (a.Position + b.Position) / 2f;
             transform.localScale = Vector3.one;
+
+            if (_buildingView != null)
+            {
+                Transform viewTransform = _buildingView.transform;
+                viewTransform.localPosition = Vector3.zero;
+                viewTransform.localRotation = Quaternion.identity;
+                viewTransform.localScale = Vector3.one * 0.001f;
+            }
 
             Vector2 center = (Vector2)transform.position;
             EdgeCollider2D ec = Collider as EdgeCollider2D;

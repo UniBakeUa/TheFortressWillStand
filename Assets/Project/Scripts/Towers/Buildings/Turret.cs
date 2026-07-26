@@ -35,6 +35,8 @@ public class Turret : BaseBuilding
     [SerializeField] private float _aimBeforeShootDuration = 0.3f;
     [SerializeField] private float _postShotFreezeDuration = 0.5f;
     [SerializeField] private float _aimingRotationSpeedMultiplier = 3f;
+    [SerializeField] private RangeCircle _rangeCircle;
+    [SerializeField] private Color _hoverRangeColor = Color.green;
 
     private const float AimToleranceDegrees = 5f;
 
@@ -253,9 +255,8 @@ public class Turret : BaseBuilding
 
     private IEnumerator RecoilRoutine()
     {
-        Vector3 startLocalPosition = _turretVisual.localPosition;
-        Vector3 recoilDirection = _turretVisual.InverseTransformDirection(-_lastRecoilDirection).normalized;
-        Vector3 recoiledLocalPosition = startLocalPosition + recoilDirection * _recoilOffset;
+        Vector3 startWorldPosition = _turretVisual.position;
+        Vector3 recoiledWorldPosition = startWorldPosition - _lastRecoilDirection * _recoilOffset;
 
         float halfDuration = _recoilDuration * 0.5f;
 
@@ -263,7 +264,7 @@ public class Turret : BaseBuilding
         while (elapsed < halfDuration)
         {
             elapsed += Time.deltaTime;
-            _turretVisual.localPosition = Vector3.Lerp(startLocalPosition, recoiledLocalPosition, elapsed / halfDuration);
+            _turretVisual.position = Vector3.Lerp(startWorldPosition, recoiledWorldPosition, elapsed / halfDuration);
             yield return null;
         }
 
@@ -271,11 +272,11 @@ public class Turret : BaseBuilding
         while (elapsed < halfDuration)
         {
             elapsed += Time.deltaTime;
-            _turretVisual.localPosition = Vector3.Lerp(recoiledLocalPosition, startLocalPosition, elapsed / halfDuration);
+            _turretVisual.position = Vector3.Lerp(recoiledWorldPosition, startWorldPosition, elapsed / halfDuration);
             yield return null;
         }
 
-        _turretVisual.localPosition = startLocalPosition;
+        _turretVisual.position = startWorldPosition;
         _recoilRoutine = null;
     }
 
@@ -304,6 +305,34 @@ public class Turret : BaseBuilding
             TurretModel.RotationSpeed * speedMultiplier * Time.deltaTime * 100
         );
 
+    }
+
+    private int _rangeVisibilityCount;
+
+    public void ShowRange(Color color)
+    {
+        _rangeVisibilityCount++;
+        RefreshRangeVisual(color);
+    }
+
+    public void HideRange()
+    {
+        _rangeVisibilityCount = Mathf.Max(0, _rangeVisibilityCount - 1);
+        RefreshRangeVisual(_hoverRangeColor);
+    }
+
+    private void RefreshRangeVisual(Color color)
+    {
+        if (_rangeCircle == null || TurretModel == null) return;
+
+        if (_rangeVisibilityCount > 0)
+        {
+            _rangeCircle.Show(TurretModel.AttackRange, color);
+        }
+        else
+        {
+            _rangeCircle.Hide();
+        }
     }
 
 }

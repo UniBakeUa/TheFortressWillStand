@@ -10,7 +10,7 @@ namespace Towers.Buildings
 {
     public class BaseBuilding : MonoBehaviour, IDamageable
     {
-        [Header("����� ������������")]
+        [Header("����� ������������")]
         [SerializeField] private bool _isSlipable;
 
         [Header("Child Objects")]
@@ -25,6 +25,17 @@ namespace Towers.Buildings
         protected Collider2D Collider { get; private set; }
         protected WaterGrid WaterGrid { get; private set; }
         private float _registeredRadius;
+
+        /// <summary>Радіус колайдера будівлі у world-одиницях (для обходу ворогами).</summary>
+        public float ObstacleRadius
+        {
+            get
+            {
+                if (Collider == null) return 0f;
+                var bounds = Collider.bounds;
+                return Mathf.Max(bounds.extents.x, bounds.extents.y);
+            }
+        }
 
         protected virtual void Awake()
         {

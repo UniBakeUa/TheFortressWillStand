@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using Managers;
 using Towers.Buildings;
 using Towers.Models;
@@ -10,7 +9,7 @@ using UnityEngine.Events;
 namespace Towers
 {
     //������� ������, ��� ����� ���������. ���� � ��� ����������, ����� ��� ����������� ����� ��������
-    public class Fortress : BaseBuilding
+    public class Fortress : BaseBuilding, IDamageFlashTarget
     {
         [Header("������������ �������")]
         [SerializeField] private FortressConfig _fortressConfig;
@@ -62,7 +61,9 @@ namespace Towers
         {
             if (currentHP < _lastKnownHP)
             {
-                PlayHitAnimation();
+                _hitRoutine = DamageFlashEffect.Play(
+                    this, this, _hitRoutine, _hitFlashColor, _hitAnimationDuration, _hitAnimationDuration, _hitShakeOffset,
+                    onComplete: () => _hitRoutine = null);
             }
             _lastKnownHP = currentHP;
 
@@ -82,28 +83,19 @@ namespace Towers
             }
         }
 
-        private void PlayHitAnimation()
-        {
-            if (_hitRoutine != null) return;
-
-            _hitRoutine = StartCoroutine(HitAnimationRoutine());
-        }
-
-        private IEnumerator HitAnimationRoutine()
+        public void SetFlashColor(Color color)
         {
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 if (_spriteRenderers[i] != null)
                 {
-                    _spriteRenderers[i].color = _hitFlashColor;
+                    _spriteRenderers[i].color = color;
                 }
             }
+        }
 
-            Vector2 shakeOffset = UnityEngine.Random.insideUnitCircle * _hitShakeOffset;
-            transform.localPosition = _originalLocalPosition + new Vector3(shakeOffset.x, shakeOffset.y, 0f);
-
-            yield return new WaitForSeconds(_hitAnimationDuration);
-
+        public void ResetColor()
+        {
             for (int i = 0; i < _spriteRenderers.Length; i++)
             {
                 if (_spriteRenderers[i] != null)
@@ -111,11 +103,16 @@ namespace Towers
                     _spriteRenderers[i].color = _originalColors[i];
                 }
             }
+        }
+
+        public void Shake(Vector2 offset)
+        {
+            transform.localPosition = _originalLocalPosition + new Vector3(offset.x, offset.y, 0f);
+        }
+
+        public void ResetPosition()
+        {
             transform.localPosition = _originalLocalPosition;
-
-            yield return new WaitForSeconds(_hitAnimationDuration);
-
-            _hitRoutine = null;
         }
 
         public override void Collapse()
@@ -124,7 +121,7 @@ namespace Towers
 
             GameStateManager.Instance.ChangeState(GameState.Paused);
             EndMenu.Instance.Show();
-            
+
         }
     }
 }

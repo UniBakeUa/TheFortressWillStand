@@ -30,6 +30,8 @@ namespace Managers
         [SerializeField] private Color allowedGhostColor = Color.white;
         [SerializeField] private Color forbiddenGhostColor = new Color(1f, 0.3f, 0.3f, 0.6f);
         [SerializeField] private LayerMask wallmask;
+        [SerializeField] private Color _ghostRangeColor = Color.cyan;
+        [SerializeField] private Color _otherTurretsRangeColor = Color.green;
 
         [Header("Світ та об'єкти")]
         [SerializeField] private Transform _sandTransform;
@@ -44,6 +46,9 @@ namespace Managers
         private GameObject _towerGhost;
         private GameObject _wallGhost;
         private LineRenderer _wallGhostLR;
+        private RangeCircle _towerGhostRangeCircle;
+        private bool _isShowingOtherTurretRanges;
+        private readonly List<Turret> _turretsWithVisibleRange = new();
 
         private ITower _firstSelectedTower;
         private MoneyManager _moneyManager;
@@ -141,9 +146,12 @@ namespace Managers
             if (_towerGhost != null) Destroy(_towerGhost);
             if (_wallGhost != null) Destroy(_wallGhost);
 
+            HideOtherTurretRanges();
+
             _towerGhost = null;
             _wallGhost = null;
             _wallGhostLR = null;
+            _towerGhostRangeCircle = null;
 
             if (_currentBuildingConfig == null || _currentBuildingConfig.Prefab == null) return;
 
@@ -151,6 +159,7 @@ namespace Managers
             {
                 _towerGhost = Instantiate(_currentBuildingConfig.GhostPrefab, transform);
                 _towerGhost.SetActive(false);
+                _towerGhostRangeCircle = _towerGhost.GetComponentInChildren<RangeCircle>(true);
             }
 
             if (_currentBuildingConfig is ITowerData towerData && towerData.WallConfig != null)
@@ -163,6 +172,51 @@ namespace Managers
                     _wallGhostLR = _wallGhost.GetComponent<LineRenderer>();
                 }
             }
+
+            _isShowingOtherTurretRanges = _currentBuildingConfig is TurretConfig;
+            if (!_isShowingOtherTurretRanges)
+            {
+                HideOtherTurretRanges();
+            }
+        }
+
+        private void RefreshOtherTurretRanges()
+        {
+            if (!_isShowingOtherTurretRanges)
+            {
+                HideOtherTurretRanges();
+                return;
+            }
+
+            var currentTurrets = FindObjectsByType<Turret>(FindObjectsSortMode.None);
+
+            foreach (var turret in currentTurrets)
+            {
+                if (!_turretsWithVisibleRange.Contains(turret))
+                {
+                    turret.ShowRange(_otherTurretsRangeColor);
+                    _turretsWithVisibleRange.Add(turret);
+                }
+            }
+
+            for (int i = _turretsWithVisibleRange.Count - 1; i >= 0; i--)
+            {
+                var turret = _turretsWithVisibleRange[i];
+                if (turret == null || System.Array.IndexOf(currentTurrets, turret) < 0)
+                {
+                    if (turret != null) turret.HideRange();
+                    _turretsWithVisibleRange.RemoveAt(i);
+                }
+            }
+        }
+
+        private void HideOtherTurretRanges()
+        {
+            foreach (var turret in _turretsWithVisibleRange)
+            {
+                if (turret != null) turret.HideRange();
+            }
+            _turretsWithVisibleRange.Clear();
         }
 
         private void Update()
@@ -171,6 +225,7 @@ namespace Managers
             {
                 if (_towerGhost) _towerGhost.SetActive(false);
                 if (_wallGhost) _wallGhost.SetActive(false);
+                HideOtherTurretRanges();
                 return;
             }
 
@@ -341,6 +396,7 @@ namespace Managers
             _currentBuildingConfig = null;
             if (_towerGhost != null) _towerGhost.SetActive(false);
             if (_wallGhost != null) _wallGhost.SetActive(false);
+            HideOtherTurretRanges();
         }
 
         private ITower CreateStructure(Vector2 pos)
@@ -407,6 +463,8 @@ namespace Managers
 
         private void UpdateGhosts(Vector2 mousePos)
         {
+            RefreshOtherTurretRanges();
+
             // ФІКС: Перевіряємо, чи об'єкт, який стоїть за інтерфейсом, не був знищений Unity
             if (_firstSelectedTower != null && (_firstSelectedTower as UnityEngine.Object) == null)
             {
@@ -432,6 +490,11 @@ namespace Managers
             {
                 _towerGhost.SetActive(_currentSelectionId >= 0);
                 _towerGhost.transform.position = ghostPos;
+
+                if (_towerGhostRangeCircle != null && _currentBuildingConfig is TurretConfig turretConfig)
+                {
+                    _towerGhostRangeCircle.Show(turretConfig.AttackRange, _ghostRangeColor);
+                }
             }
 
             if (_wallGhost != null)

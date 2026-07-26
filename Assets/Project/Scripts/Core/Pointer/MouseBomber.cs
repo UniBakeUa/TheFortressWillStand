@@ -1,3 +1,5 @@
+using System.Collections;
+using Towers.Buildings;
 using UnityEngine;
 
 public class MouseBomber : MonoBehaviour
@@ -8,6 +10,15 @@ public class MouseBomber : MonoBehaviour
     [SerializeField] private AudioClip shotSound;
 
     [SerializeField] private Explosion _explosionPrefab;
+
+    [Header("Range Indicator")]
+    [SerializeField] private RangeCircle _rangeCircle;
+    [SerializeField] private Color _rangeColor = Color.cyan;
+    [SerializeField] private Color _upgradeFlashColor = Color.yellow;
+    [SerializeField] private float _upgradeFlashDuration = 0.3f;
+
+    private Coroutine _upgradeFlashRoutine;
+
     private void OnEnable()
     {
         PointerInfo.LeftMouseButtonDown += Bomb;
@@ -19,6 +30,25 @@ public class MouseBomber : MonoBehaviour
     private void Start()
     {
         _startRadius = _radius;
+    }
+
+    private void Update()
+    {
+        if (_rangeCircle == null) return;
+
+        bool isWaveActive = GameStateManager.Instance.CurrentState == GameState.Playing;
+
+        if (!isWaveActive)
+        {
+            _rangeCircle.Hide();
+            return;
+        }
+
+        _rangeCircle.transform.position = PointerInfo.PointerWorldPosition;
+        if (_upgradeFlashRoutine == null)
+        {
+            _rangeCircle.Show(_radius, _rangeColor);
+        }
     }
     private void Bomb(Vector2 position, bool state)
     {
@@ -44,6 +74,25 @@ public class MouseBomber : MonoBehaviour
     public void ModifyRadius(float amount)
     {
         _radius += _startRadius * amount;
+
+        if (_rangeCircle != null)
+        {
+            if (_upgradeFlashRoutine != null)
+            {
+                StopCoroutine(_upgradeFlashRoutine);
+            }
+            _upgradeFlashRoutine = StartCoroutine(UpgradeFlashRoutine());
+        }
+    }
+
+    private IEnumerator UpgradeFlashRoutine()
+    {
+        _rangeCircle.transform.position = PointerInfo.PointerWorldPosition;
+        _rangeCircle.Show(_radius, _upgradeFlashColor);
+
+        yield return new WaitForSeconds(_upgradeFlashDuration);
+
+        _upgradeFlashRoutine = null;
     }
     public float GetRadiusFraction()
     {
