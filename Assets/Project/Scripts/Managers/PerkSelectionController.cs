@@ -181,7 +181,7 @@ namespace Managers
 
             // Міняємо лише взяту картку - сусідні лишаються ті самі, щоб гравець
             // не втрачав з очей те, що вже роздивився.
-            ReplaceCard(perk);
+            int replacedIndex = ReplaceCard(perk);
 
             if (_currentOffer.Count == 0)
             {
@@ -190,7 +190,9 @@ namespace Managers
                 return true;
             }
 
-            _view.RefreshChangedCards(_currentOffer, this);
+            // Замінений слот перестворюємо примусово: нова картка може виявитись
+            // такою самою, і без цього клік лишився б без будь-якої реакції.
+            _view.RefreshChangedCards(_currentOffer, this, replacedIndex);
             RefreshViewState();
             return true;
         }
@@ -311,10 +313,11 @@ namespace Managers
         /// Замінює одну картку в наборі на нову з колоди, решту лишає на місці.
         /// Якщо колода порожня - картка просто зникає з набору.
         /// </summary>
-        private void ReplaceCard(PerkConfig taken)
+        /// <returns>Індекс заміненого слота, або -1 якщо картки в наборі не було.</returns>
+        private int ReplaceCard(PerkConfig taken)
         {
             int index = _currentOffer.IndexOf(taken);
-            if (index < 0) return;
+            if (index < 0) return -1;
 
             // Прибираємо взяту картку зі столу ДО добору: інакше вона лишалась би
             // у списку виключень і блокувала власні ж копії в колоді.
@@ -322,8 +325,10 @@ namespace Managers
 
             PerkConfig replacement = DrawCard(_currentOffer);
 
-            if (replacement != null)
-                _currentOffer.Insert(index, replacement);
+            if (replacement == null) return -1;
+
+            _currentOffer.Insert(index, replacement);
+            return index;
         }
 
         /// <summary>

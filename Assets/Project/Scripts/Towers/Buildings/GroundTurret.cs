@@ -82,6 +82,8 @@ namespace Towers.Buildings
             {
                 if (hit.TryGetComponent(out Enemy enemy))
                 {
+                    // Дамаг не беремо з TurretModel.Damage: там 10, і турель
+                    // убивала б з одного пострілу. Один постріл - одне HP.
                     bool isDirectHit = ((Vector2)enemy.transform.position - (Vector2)center).sqrMagnitude < 0.04f;
                     enemy.WasStricken(isDirectHit ? shotOrigin : (Vector2)center);
                 }

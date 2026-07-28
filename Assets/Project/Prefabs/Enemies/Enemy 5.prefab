@@ -122,13 +122,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moneyValue: 15
-  speed: 1
-  AttackDistance: 4
+  speed: 2
+  AttackDistance: 7
   damage: 15
-  attackDelay: 10
+  attackDelay: 5
   firstAttackDelay: 2
   crashGravity: 3
   crashRotation: 350
+  _maxHP: 40
+  _clickDamage: 5
+  _hitFlashColor: {r: 1, g: 0.5, b: 0.5, a: 1}
+  _hitFlashDuration: 0.06
+  _turret: {fileID: 5644699966226641498}
+  _turretRotationSpeed: 120
+  _turretAngleOffset: 0
+  _turretLaunchForce: 8
+  _turretSideSpread: 0.4
+  _turretGravity: 3
+  _turretSpin: 400
+  _turretLifetime: 4
+  _deathStyle: 1
+  _wreckLifetime: 0.5
+  _wreckFadeDuration: 0.4
+  _wreckTint: {r: 0.45, g: 0.45, b: 0.45, a: 1}
   _leavesBloodTrail: 1
   _bloodSplatScale: 1
   _explosionPrefab: {fileID: 5717577051735948075, guid: 4bc825b1ec021e744981813233d0aad4, type: 3}
@@ -244,7 +260,7 @@ GameObject:
   - component: {fileID: 5644699966226641498}
   - component: {fileID: 8629813705370529637}
   m_Layer: 9
-  m_Name: Square (1)
+  m_Name: "\u0431\u0430\u0448\u0442\u0430"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

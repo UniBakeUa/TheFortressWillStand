@@ -33,6 +33,12 @@ namespace Managers
         [Tooltip("Звідки взяти префаб вибуху, якщо поле вище порожнє")]
         [SerializeField] private MouseBomber _mouseBomber;
 
+        [Header("Періодичні ефекти")]
+        [Tooltip("Розкид інтервалу, частка. 0.15 = ±15%. Щоб кілька перків не " +
+                 "спрацьовували завжди одночасно. Великі значення помітно " +
+                 "розтягують короткі інтервали")]
+        [SerializeField, Range(0f, 0.9f)] private float _periodicJitter = 0.15f;
+
         [Header("Діагностика")]
         [Tooltip("Логувати кожен тік авторемонту - видно, чи перк узагалі працює")]
         [SerializeField] private bool _logRepairs;
@@ -40,6 +46,10 @@ namespace Managers
         [Header("Німцеріз")]
         [Tooltip("Радіус удару 'пальцем' по випадковому ворогу")]
         [SerializeField] private float _fingerStrikeRadius = 1f;
+        [Tooltip("Скільки HP знімає удар. Стільки ж, скільки клік мишкою")]
+        [SerializeField] private int _fingerStrikeDamage = 5;
+        [Tooltip("Спрайт-позначка в точці удару (префаб із ClickMarker)")]
+        [SerializeField] private UI.ClickMarker _clickMarkerPrefab;
 
         // Скільки разів узято кожну картку. Скільки їх узагалі можна взяти,
         // обмежує колода (PerkConfig.CopiesInDeck), а не цей лічильник.
@@ -77,6 +87,28 @@ namespace Managers
             public float Amount;
             public float Interval;
             public float Timer;
+
+            /// <summary>
+            /// Інтервал до наступного спрацювання - базовий Interval із випадковим
+            /// відхиленням. Без нього кілька перків, узятих в одному раунді,
+            /// тікали б синхронно і били б завжди одночасно.
+            /// </summary>
+            public float NextInterval = -1f;
+
+            /// <summary>Коли цей таймер востаннє спрацював - лише для діагностики.</summary>
+            public float LastFireTime;
+
+            public void RollNextInterval(float jitter)
+            {
+                if (jitter <= 0f)
+                {
+                    NextInterval = Interval;
+                    return;
+                }
+
+                float offset = Interval * jitter;
+                NextInterval = Mathf.Max(0.1f, Interval + Random.Range(-offset, offset));
+            }
         }
 
         private void Awake()
@@ -144,25 +176,49 @@ namespace Managers
 
         private void AddPeriodicEffect(PerkConfig perk)
         {
-            // Другий такий самий перк не додає окремий таймер, а підсилює наявний:
-            // інакше два "+1 HP раз на 5с" тікали б у різній фазі й виглядали як хаос.
-            foreach (var effect in _periodicEffects)
+            // Німцеріз НЕ зливається: кожна взята картка - окремий "палець" зі
+            // своїм таймером, тож два перки по 3с дають удари вдвічі частіше.
+            // Ремонт навпаки зливаємо - інакше кілька лічильників лікували б
+            // одну будівлю в різній фазі, і це виглядало б як хаос.
+            if (!IsStackedAsSeparateTimer(perk.EffectType))
             {
-                if (effect.Type != perk.EffectType) continue;
+                foreach (var effect in _periodicEffects)
+                {
+                    if (effect.Type != perk.EffectType) continue;
 
-                effect.Amount += perk.Amount;
-                // Інтервал беремо найкоротший із узятих.
-                effect.Interval = Mathf.Min(effect.Interval, Mathf.Max(0.1f, perk.SecondaryAmount));
-                return;
+                    effect.Amount += perk.Amount;
+                    // Інтервал беремо найкоротший із узятих.
+                    effect.Interval = Mathf.Min(effect.Interval, Mathf.Max(0.1f, perk.SecondaryAmount));
+
+                    // Перекочуємо і чекання, інакше воно лишилось би від старого,
+                    // довшого інтервалу.
+                    effect.RollNextInterval(_periodicJitter);
+                    return;
+                }
             }
 
-            _periodicEffects.Add(new PeriodicEffect
+            var newEffect = new PeriodicEffect
             {
                 Type = perk.EffectType,
                 Amount = perk.Amount,
                 Interval = Mathf.Max(0.1f, perk.SecondaryAmount),
                 Timer = 0f,
-            });
+            };
+
+            // Стартова фаза теж випадкова, інакше перки, узяті в одному раунді,
+            // почали б відлік з нуля разом і перший тік у них збігся б.
+            newEffect.RollNextInterval(_periodicJitter);
+            newEffect.Timer = Random.Range(0f, newEffect.NextInterval);
+
+            _periodicEffects.Add(newEffect);
+        }
+
+        /// <summary>
+        /// Чи отримує кожна копія перка власний таймер замість злиття в один.
+        /// </summary>
+        private static bool IsStackedAsSeparateTimer(PerkEffectType type)
+        {
+            return type == PerkEffectType.AutoFingerStrike;
         }
 
         /// <summary>
@@ -219,9 +275,19 @@ namespace Managers
 
                 effect.Timer += Time.deltaTime;
 
-                if (effect.Timer < effect.Interval) continue;
+                if (effect.Timer < effect.NextInterval) continue;
 
-                effect.Timer -= effect.Interval;
+                // Цілей немає - тік НЕ списуємо. Таймер лишається "заряджений",
+                // і удар прилетить першої ж миті, коли ворог з'явиться.
+                if (!CanFireNow(effect.Type))
+                {
+                    effect.Timer = effect.NextInterval;
+                    continue;
+                }
+
+                effect.Timer -= effect.NextInterval;
+                effect.RollNextInterval(_periodicJitter);
+
                 FirePeriodicEffect(effect);
             }
         }
@@ -248,9 +314,29 @@ namespace Managers
                     break;
 
                 case PerkEffectType.AutoFingerStrike:
+                    if (_logRepairs)
+                    {
+                        Debug.Log($"[PerkManager] Німцеріз (інтервал {effect.Interval:F1}с) б'є. " +
+                                  $"Минуло з його попереднього удару: {Time.time - effect.LastFireTime:F2}с");
+                    }
+                    effect.LastFireTime = Time.time;
+
                     FingerStrikeRandomEnemy();
                     break;
             }
+        }
+
+        /// <summary>
+        /// Чи є сенс витрачати тік. Німцеріз без живих цілей нікуди не вдарить,
+        /// а тік уже був би списаний - і наступний удар прийшов би аж через
+        /// повний інтервал. Так перк "бив набагато рідше", ніж заявлено.
+        /// </summary>
+        private bool CanFireNow(PerkEffectType type)
+        {
+            if (type != PerkEffectType.AutoFingerStrike) return true;
+
+            return _spawnerManager != null
+                && PickRandomAliveEnemy(_spawnerManager.ActiveEnemies) != null;
         }
 
         private void RepairBuildings(float amount, bool repairFortress)
@@ -292,13 +378,21 @@ namespace Managers
 
             Vector2 position = target.transform.position;
 
+            // Позначка в точці удару - інакше незрозуміло, що перк узагалі
+            // спрацював і куди саме "тицьнув палець".
+            if (_clickMarkerPrefab != null)
+            {
+                Instantiate(_clickMarkerPrefab, position, Quaternion.identity);
+            }
+
             var hits = Physics2D.CircleCastAll(position, _fingerStrikeRadius, Vector2.zero, 0f, LayerMask.GetMask("Enemy"));
             foreach (var hit in hits)
             {
                 if (hit.transform.TryGetComponent(out Enemy enemy))
                 {
                     // Як і MouseBomber - б'ємо згори, напрямку розльоту крові немає.
-                    enemy.WasStricken();
+                    // Перк імітує клік пальцем, тож і дамаг має бути такий самий.
+                    enemy.WasStricken(null, _fingerStrikeDamage);
                 }
             }
 
@@ -333,6 +427,8 @@ namespace Managers
 
         private Enemy PickRandomAliveEnemy(List<Enemy> enemies)
         {
+            if (enemies == null) return null;
+
             // Резервуарний вибір: список може містити вимкнених ворогів, тож
             // просто Random.Range по індексу міг би раз за разом влучати в них.
             Enemy chosen = null;

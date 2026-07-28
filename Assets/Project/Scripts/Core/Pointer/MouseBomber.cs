@@ -6,6 +6,8 @@ using UnityEngine;
 public class MouseBomber : MonoBehaviour
 {
     [SerializeField] private float _radius = 1;
+    [Tooltip("Скільки HP знімає один клік. Ворог із 10 HP гине за два кліки")]
+    [SerializeField] private int _clickDamage = 5;
     private float _startRadius;
     private Vector2 _position;
 
@@ -65,7 +67,7 @@ public class MouseBomber : MonoBehaviour
             if (e.transform.TryGetComponent(out Items.Enemy enemy))
             {
                 // Б'ємо ніби згори - напрямку розльоту немає, лишається клякса
-                enemy.WasStricken();
+                enemy.WasStricken(null, _clickDamage);
             }
         }
         var explosion = Instantiate(_explosionPrefab, _position, Quaternion.identity);

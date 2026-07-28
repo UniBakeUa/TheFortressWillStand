@@ -37,6 +37,13 @@ namespace UI
                  "піднімається знизу на своє місце")]
         [SerializeField] private bool _appearFromCenter = true;
 
+        [Header("Анімація взяття")]
+        [Tooltip("На скільки картка злітає вгору, коли її забрали")]
+        [SerializeField] private float _takenFlyDistance = 220f;
+        [SerializeField] private float _takenScale = 1.15f;
+        [Tooltip("Має бути коротко: нова картка чекає, поки ця долетить")]
+        [SerializeField] private float _takenDuration = 0.2f;
+
         [Header("Недоступна картка")]
         [SerializeField, Range(0f, 1f)] private float _lockedAlpha = 0.45f;
 
@@ -67,8 +74,12 @@ namespace UI
         /// анімацію появи й наведення.
         /// </param>
         /// <param name="centerX">X центру ряду - звідти картки розлітаються на свої місця.</param>
+        /// <param name="appearDelay">
+        /// Пауза перед появою. Використовується, коли на цьому місці ще долітає
+        /// щойно взята картка.
+        /// </param>
         public void Setup(PerkConfig perk, PerkSelectionController controller, int indexInRow,
-            Vector2 restPosition, float centerX)
+            Vector2 restPosition, float centerX, float appearDelay = 0f)
         {
             _restPosition = restPosition;
             _centerX = centerX;
@@ -88,7 +99,7 @@ namespace UI
 
             if (_frameImage != null) _frameImage.color = perk.Tint;
 
-            PlayAppearAnimation(indexInRow);
+            PlayAppearAnimation(indexInRow, appearDelay);
         }
 
         /// <summary>Оновлює ціну картки в пончиках і доступність.</summary>
@@ -103,6 +114,14 @@ namespace UI
         {
             _isInteractable = value;
 
+            // Картка вже відлітає - її alpha веде твін, і перезаписувати її тут
+            // означало б обірвати згасання.
+            if (_isFlyingAway)
+            {
+                if (_canvasGroup != null) _canvasGroup.blocksRaycasts = false;
+                return;
+            }
+
             if (_canvasGroup != null)
             {
                 _canvasGroup.alpha = value ? 1f : _lockedAlpha;
@@ -111,7 +130,7 @@ namespace UI
             }
         }
 
-        private void PlayAppearAnimation(int indexInRow)
+        private void PlayAppearAnimation(int indexInRow, float appearDelay = 0f)
         {
             _appearSequence?.Kill();
 
@@ -127,7 +146,7 @@ namespace UI
             if (_canvasGroup != null) _canvasGroup.alpha = 0f;
 
             _appearSequence = DOTween.Sequence();
-            _appearSequence.AppendInterval(indexInRow * _appearStagger);
+            _appearSequence.AppendInterval(appearDelay + indexInRow * _appearStagger);
             _appearSequence.Append(_rect.DOAnchorPos(_restPosition, _appearDuration).SetEase(Ease.OutBack));
             _appearSequence.Join(_rect.DOScale(1f, _appearDuration).SetEase(Ease.OutBack));
 
@@ -178,8 +197,56 @@ namespace UI
             // Знімаємо інтерактив одразу: другий клік по тій самій картці, поки
             // програється анімація, не має купити перк двічі.
             SetInteractable(false);
+
+            PlayTakenAnimation();
+
             _controller.TakeCard(_perk);
         }
+
+        /// <summary>
+        /// Ривок угору зі згасанням - підтвердження, що картку забрали. Грає на
+        /// цій, уже приреченій картці; заміна створюється поверх неї окремо.
+        /// </summary>
+        private void PlayTakenAnimation()
+        {
+            _hoverSequence?.Kill();
+            _appearSequence?.Kill();
+
+            // Виводимо з-під нової картки, щоб вони не накладались.
+            _rect.SetAsLastSibling();
+
+            Sequence taken = DOTween.Sequence().SetUpdate(true);
+            // InBack: картка спершу трохи присідає вниз, а тоді її різко висмикує
+            // вгору - читається як ривок, а не як плавний від'їзд.
+            taken.Join(_rect.DOAnchorPos(_restPosition + new Vector2(0f, _takenFlyDistance), _takenDuration)
+                .SetEase(Ease.InBack));
+            taken.Join(_rect.DOScale(_takenScale, _takenDuration).SetEase(Ease.InQuad));
+
+            if (_canvasGroup != null)
+            {
+                // Згасання під кінець: більшу частину польоту картка лишається
+                // видимою, інакше ривок губиться.
+                taken.Join(_canvasGroup.DOFade(0f, _takenDuration * 0.6f)
+                    .SetDelay(_takenDuration * 0.4f));
+            }
+
+            _isFlyingAway = true;
+            taken.OnComplete(() =>
+            {
+                if (this != null) Destroy(gameObject);
+            });
+        }
+
+        /// <summary>
+        /// Картку вже забрали і вона долітає. Панель не має її знищувати - інакше
+        /// анімація обірветься на першому ж кадрі.
+        /// </summary>
+        public bool IsFlyingAway => _isFlyingAway;
+
+        /// <summary>Скільки триває виліт - панель на цей час притримує нову картку.</summary>
+        public float TakenDuration => _takenDuration;
+
+        private bool _isFlyingAway;
 
         private void OnDestroy()
         {

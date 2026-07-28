@@ -758,10 +758,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _perkLibrary: {fileID: 11400000, guid: 939a6c73977caca4181f408ea870dfa3, type: 2}
   _spawnerManager: {fileID: 2011065932}
-  _fingerStrikeExplosionPrefab: {fileID: 0}
-  _mouseBomber: {fileID: 0}
+  _fingerStrikeExplosionPrefab: {fileID: 3622452643929252112, guid: 4bc825b1ec021e744981813233d0aad4, type: 3}
+  _mouseBomber: {fileID: 834457410}
+  _periodicJitter: 0.25
   _logRepairs: 1
   _fingerStrikeRadius: 1
+  _fingerStrikeDamage: 5
+  _clickMarkerPrefab: {fileID: 5706127995606279231, guid: d72dd9de739fe4a4e9e1defbdf3514ce, type: 3}
 --- !u!1 &152938956
 GameObject:
   m_ObjectHideFlags: 0
@@ -2285,7 +2288,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00012207031, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &453402072
@@ -5166,6 +5169,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _radius: 0.1
+  _clickDamage: 5
   _explosionPrefab: {fileID: 3622452643929252112, guid: 4bc825b1ec021e744981813233d0aad4, type: 3}
   _rangeCircle: {fileID: 100526928552820409}
   _rangeColor: {r: 0, g: 1, b: 1, a: 1}
@@ -8269,7 +8273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81c1253fb852ed649900b827b35ad309, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _startPonchics: 100
+  _startPonchics: 0
 --- !u!1 &1411024823
 GameObject:
   m_ObjectHideFlags: 0
@@ -8697,7 +8701,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00012207031, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1422020859
@@ -11991,7 +11995,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0.00012207031, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2021620731

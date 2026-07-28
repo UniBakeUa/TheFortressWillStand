@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Managers;
@@ -96,6 +97,9 @@ namespace UI
 
             BuildCards(perks, controller);
 
+            _swapBlockTween?.Kill();
+            _swapBlockTween = null;
+
             _transition?.Kill();
             IsTransitioning = true;
 
@@ -143,7 +147,13 @@ namespace UI
         /// забрав одну картку: сусідні мають лишитись на місці, без повторної
         /// анімації появи.
         /// </summary>
-        public void RefreshChangedCards(IReadOnlyList<PerkConfig> perks, PerkSelectionController controller)
+        /// <param name="forceIndex">
+        /// Слот, який треба перестворити навіть якщо перк у ньому не змінився.
+        /// Саме цей випадок: узяту картку замінило те саме, і без примусу гравець
+        /// не побачив би жодної реакції на свій клік.
+        /// </param>
+        public void RefreshChangedCards(IReadOnlyList<PerkConfig> perks, PerkSelectionController controller,
+            int forceIndex = -1)
         {
             // Кількість слотів змінилась (колода спорожніла) - простіше зібрати заново.
             if (perks.Count != _spawnedCards.Count)
@@ -152,10 +162,26 @@ namespace UI
                 return;
             }
 
+            // Найдовша із затримок - стільки триває вся заміна, і саме на цей час
+            // панель не приймає кліків.
+            float maxAppearDelay = 0f;
+
             for (int i = 0; i < perks.Count; i++)
             {
                 PerkCardView existing = _spawnedCards[i];
-                if (existing != null && existing.Perk == perks[i]) continue;
+                if (i != forceIndex && existing != null && existing.Perk == perks[i]) continue;
+
+                if (existing != null && existing.IsFlyingAway)
+                {
+                    // Стара картка ще в польоті. Слот звільняємо, а нову створимо
+                    // аж тоді, коли попередня долетить і знищить себе сама.
+                    existing.Discard();
+                    _spawnedCards[i] = null;
+
+                    maxAppearDelay = Mathf.Max(maxAppearDelay, existing.TakenDuration);
+                    StartCoroutine(SpawnCardAfter(existing.TakenDuration, i, perks[i], controller, perks.Count));
+                    continue;
+                }
 
                 if (existing != null)
                 {
@@ -163,16 +189,82 @@ namespace UI
                     Destroy(existing.gameObject);
                 }
 
-                PerkCardView card = Instantiate(_cardPrefab, _cardContainer);
-                card.Setup(perks[i], controller, indexInRow: 0, GetCardPosition(i, perks.Count), centerX: 0f);
-                _spawnedCards[i] = card;
+                SpawnCardAt(i, perks[i], controller, perks.Count);
             }
 
             if (controller != null)
             {
                 UpdateCosts(controller.GetCurrentCardPonchicCost(), controller.RerollCost, controller.CanReroll());
             }
+
+            BlockInputDuringSwap(maxAppearDelay);
         }
+
+        private PerkCardView SpawnCardAt(int index, PerkConfig perk, PerkSelectionController controller, int totalCards)
+        {
+            if (_cardPrefab == null || _cardContainer == null) return null;
+
+            PerkCardView card = Instantiate(_cardPrefab, _cardContainer);
+            card.Setup(perk, controller, indexInRow: 0, GetCardPosition(index, totalCards), centerX: 0f);
+
+            // Слот міг зникнути, поки ми чекали (реролл, закриття панелі).
+            if (index < _spawnedCards.Count)
+                _spawnedCards[index] = card;
+
+            return card;
+        }
+
+        /// <summary>
+        /// Чекає, поки взята картка долетить, і аж тоді створює нову на її місці.
+        /// </summary>
+        private IEnumerator SpawnCardAfter(float delay, int index, PerkConfig perk,
+            PerkSelectionController controller, int totalCards)
+        {
+            // Realtime: анімації карток крутяться на паузі вибору.
+            yield return new WaitForSecondsRealtime(delay);
+
+            // За цей час набір міг змінитися - тоді слот уже не наш.
+            if (index >= _spawnedCards.Count) yield break;
+            if (_spawnedCards[index] != null) yield break;
+
+            PerkCardView card = SpawnCardAt(index, perk, controller, totalCards);
+
+            if (card != null && controller != null)
+            {
+                card.SetCost(controller.GetCurrentCardPonchicCost(), CanAffordCard(controller));
+            }
+        }
+
+        private static bool CanAffordCard(PerkSelectionController controller)
+        {
+            int cost = controller.GetCurrentCardPonchicCost();
+
+            return cost <= 0
+                   || (PonchicManager.Instance != null && PonchicManager.Instance.HasPonchics(cost));
+        }
+
+        /// <summary>
+        /// Глушить усю панель, поки взята картка відлітає і на її місце виїжджає
+        /// нова. Без цього сусідні картки лишались би клікабельними, і гравець
+        /// міг би взяти другий перк посеред анімації першого.
+        /// </summary>
+        private void BlockInputDuringSwap(float duration)
+        {
+            if (duration <= 0f) return;
+
+            _swapBlockTween?.Kill();
+            IsTransitioning = true;
+            SetInteractable(false);
+
+            _swapBlockTween = DOVirtual.DelayedCall(duration, () =>
+            {
+                IsTransitioning = false;
+                SetInteractable(true);
+                _swapBlockTween = null;
+            }, ignoreTimeScale: true);
+        }
+
+        private Tween _swapBlockTween;
 
         /// <summary>
         /// Ховає панель із анімацією. onComplete спрацює, коли вона повністю
@@ -180,6 +272,13 @@ namespace UI
         /// </summary>
         public void Hide(System.Action onComplete = null)
         {
+            // Панель закривають посеред заміни картки - той твін інакше добіг би
+            // і повернув кліки вже схованій панелі, а відкладений спавн створив
+            // би картку в уже закритій панелі.
+            _swapBlockTween?.Kill();
+            _swapBlockTween = null;
+            StopAllCoroutines();
+
             _transition?.Kill();
             IsTransitioning = true;
 
@@ -271,6 +370,9 @@ namespace UI
 
         private void ClearCards()
         {
+            // Відкладені спавни більше не актуальні: набір перебудовується цілком.
+            StopAllCoroutines();
+
             foreach (var card in _spawnedCards)
             {
                 if (card == null) continue;
@@ -292,6 +394,10 @@ namespace UI
             if (_rerollButton != null) _rerollButton.onClick.RemoveListener(OnRerollClicked);
             if (_skipButton != null) _skipButton.onClick.RemoveListener(OnSkipClicked);
             if (_canvasGroup != null) _canvasGroup.DOKill();
+
+            // Твіни переживають знищення об'єкта і б'ються в мертві посилання.
+            _swapBlockTween?.Kill();
+            _transition?.Kill();
         }
     }
 }

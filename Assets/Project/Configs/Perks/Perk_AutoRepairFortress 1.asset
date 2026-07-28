@@ -15,7 +15,7 @@ MonoBehaviour:
   <Id>k__BackingField: 3
   <DisplayName>k__BackingField: "\u0413\u0430\u0440\u043D\u0456\u0437\u043E\u043D
     \u0444\u043E\u0440\u0442\u0435\u0446\u0456"
-  <Icon>k__BackingField: {fileID: 21300000, guid: afa12e724c05bf040ba016c8348ea71f, type: 3}
+  <Icon>k__BackingField: {fileID: 21300000, guid: cb94d4d172c07b748aea0030f80b414e, type: 3}
   <Description>k__BackingField: "+{0:0} HP \u0444\u043E\u0440\u0442\u0435\u0446\u0456
     \u0440\u0430\u0437 \u043D\u0430 {1:0} \u0441"
   <Tint>k__BackingField: {r: 1, g: 0.7, b: 0.3, a: 1}

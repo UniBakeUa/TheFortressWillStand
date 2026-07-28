@@ -197,14 +197,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moneyValue: 5
   speed: 7
+  maxHP: 60
+  _clickDamage: 5
+  _hitFlashColor: {r: 1, g: 0.5, b: 0.5, a: 1}
+  _hitFlashDuration: 0.06
+  _hitSparkPrefab: {fileID: 3622452643929252112, guid: ece8a3079e9755940a0abce27c766aa8, type: 3}
+  _hitSparkScale: 0.15
+  _hitShakeStrength: 0.12
+  _minCrashVisibleTime: 0.6
+  _maxCrashDuration: 4
   crashGravity: 5
   crashRotation: 300
-  falling: {fileID: 8300000, guid: 6f589bce4df7ee74cb18d4f82f148e42, type: 3}
-  bombing: {fileID: 8300000, guid: 08677f21ec19b8949be6de51e46a3b0e, type: 3}
-  voiceLines:
-  - {fileID: 8300000, guid: f35747402dee82042b94bc4ae07fb459, type: 3}
-  - {fileID: 8300000, guid: b440a9d704d5d8e47857a9558d544835, type: 3}
-  - {fileID: 8300000, guid: 6f51839fbe748e74897d3590cd959cbe, type: 3}
   _explosionPrefab: {fileID: 5717577051735948075, guid: 4bc825b1ec021e744981813233d0aad4, type: 3}
   _epxlosionDamage: 15
   <ItemType>k__BackingField: 0

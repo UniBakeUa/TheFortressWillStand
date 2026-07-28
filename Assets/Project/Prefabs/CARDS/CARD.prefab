@@ -242,6 +242,10 @@ MonoBehaviour:
   _appearDuration: 0.35
   _appearStagger: 0.08
   _appearFromY: -120
+  _appearFromCenter: 1
+  _takenFlyDistance: 220
+  _takenScale: 1.15
+  _takenDuration: 0.2
   _lockedAlpha: 0.45
 --- !u!1 &3133486319198381714
 GameObject:
@@ -597,7 +601,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: -2311755377353461176, guid: 94cdd999a90e4f74fa0c408369c450c0, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1

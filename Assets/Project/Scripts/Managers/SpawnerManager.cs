@@ -85,12 +85,33 @@ namespace Managers
             if (Input.GetKeyDown(KeyCode.P))
             {
                 SpawnTestEnemies(10);
+                SpawnTestTanks(2);
             }
         }
 
         private void SpawnTestEnemies(int count)
         {
             if (!_spawners.TryGetValue(SpawnableItemType.Enemy, out ISpawner spawner)) return;
+
+            for (int i = 0; i < count; i++)
+            {
+                spawner.SpawnNow();
+            }
+        }
+
+        /// <summary>
+        /// Танки для тесту анімації смерті - по count кожного типу (Enemy4/Enemy5),
+        /// бо саме в них башта відлітає при загибелі.
+        /// </summary>
+        private void SpawnTestTanks(int countPerType)
+        {
+            SpawnTestOfType(SpawnableItemType.Enemy4, countPerType);
+            SpawnTestOfType(SpawnableItemType.Enemy5, countPerType);
+        }
+
+        private void SpawnTestOfType(SpawnableItemType type, int count)
+        {
+            if (!_spawners.TryGetValue(type, out ISpawner spawner)) return;
 
             for (int i = 0; i < count; i++)
             {
