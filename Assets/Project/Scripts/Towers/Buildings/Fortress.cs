@@ -54,8 +54,12 @@ namespace Towers
             Model.OnHealthChanged += OnHealthChanged;
 
             IsReady = true;
+            RegisterInRegistry();
             RegisterFootprint();
         }
+
+        /// <summary>Фортеця відрізняється від решти будівель для перків авторемонту.</summary>
+        public override bool IsFortress => true;
 
         private void OnHealthChanged(float currentHP)
         {

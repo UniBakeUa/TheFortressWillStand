@@ -49,6 +49,14 @@ namespace Towers.Buildings
         public override void Initialize(BuildingConfig config)
         {
             base.Initialize(config);
+
+            // Турель, збудована після взяття перка, має бути такою ж сильною, як
+            // ті, що стояли на момент прокачки.
+            if (Managers.PerkManager.Instance != null)
+            {
+                Managers.PerkManager.Instance.ApplyToNewTurret(this);
+            }
+
             TurretView = _buildingView as TurretView;
             if (TurretView != null)
             {

@@ -25,9 +25,12 @@ namespace Towers.Buildings
 
         public override void Initialize(BuildingConfig config)
         {
-            base.Initialize(config);
-
+            // Модель створюємо ДО base.Initialize: той вмикає IsReady, після чого
+            // FixedUpdate починає рахувати ерозію через ErosionRate, а той читає
+            // TowerModel. Зі старим порядком був ризик звернення до null.
             TowerModel = new TowerModel(config as TowerConfig);
+
+            base.Initialize(config);
 
             EnsureNodeInitialized();
         }

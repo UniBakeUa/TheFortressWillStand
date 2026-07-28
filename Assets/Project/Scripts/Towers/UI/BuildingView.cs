@@ -12,6 +12,12 @@ namespace Towers.UI
         [SerializeField] private float _damageFlashDuration = 0.05f;
         [SerializeField] private float _damageShakeOffset = 8f;
 
+        [Header("Ремонт")]
+        [SerializeField] private Color _repairFlashColor = new Color(0.35f, 1f, 0.4f, 1f);
+        [Tooltip("Спалах ремонту трохи довший за дамаг - лікування капає по краплині, " +
+                 "надто короткий спалах було б не видно")]
+        [SerializeField] private float _repairFlashDuration = 0.12f;
+
         private Image _healthFillImage;
         private RectTransform _healthSliderRect;
         private Vector2 _healthSliderOriginalPosition;
@@ -48,6 +54,14 @@ namespace Towers.UI
             {
                 _damageFlashRoutine = DamageFlashEffect.Play(
                     this, this, _damageFlashRoutine, _damageFlashColor, _damageFlashDuration, _damageFlashDuration, _damageShakeOffset,
+                    onComplete: () => _damageFlashRoutine = null);
+            }
+            else if (currentHealth > _lastKnownHealth && !float.IsNaN(_lastKnownHealth))
+            {
+                // Ремонт: той самий спалах, що й від шкоди, але зелений і без
+                // трясіння - будівлю лагодять, а не б'ють.
+                _damageFlashRoutine = DamageFlashEffect.Play(
+                    this, this, _damageFlashRoutine, _repairFlashColor, _repairFlashDuration, _repairFlashDuration, shakeOffset: 0f,
                     onComplete: () => _damageFlashRoutine = null);
             }
             else

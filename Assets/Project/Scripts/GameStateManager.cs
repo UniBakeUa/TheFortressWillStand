@@ -2,7 +2,7 @@ using Managers;
 using System;
 using UnityEngine;
 
-public enum GameState { Playing, Building, Paused }
+public enum GameState { Playing, Building, Paused, PerkSelection }
 
 public class GameStateManager : MonoBehaviour
 {

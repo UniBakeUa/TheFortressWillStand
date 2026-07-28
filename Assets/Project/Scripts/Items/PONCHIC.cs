@@ -39,11 +39,20 @@ namespace Items
             _rb.angularVelocity = Random.Range(-rotationSpeed, rotationSpeed);
         }
 
+        [Header("Ponchic Resource")]
+        [Tooltip("Скільки пончиків як ресурсу дає збір. Валюта для карток прокачки")]
+        [SerializeField] private int _ponchicValue = 1;
+
         protected override void OnMouseDown()
         {
             base.OnMouseDown();
             if (GameStateManager.Instance.CurrentState != GameState.Playing)
                 return;
+
+            // Пончик дає і монети (base.Collect), і пончики - окремий ресурс,
+            // за який беруться картки прокачки після першої.
+            if (PonchicManager.Instance != null)
+                PonchicManager.Instance.AddPonchics(_ponchicValue);
 
             _floatingTextFactory.SpawnText((int)moneyValue, transform.position + Vector3.up * 1.5f);
         }

@@ -61,6 +61,12 @@ namespace Towers.Buildings
             _originalLineColor = _lineRenderer.startColor;
             _lastKnownHP = Model.CurrentHP;
             Model.OnHealthChanged += OnHealthChanged;
+
+            // Wall не викликає base.Initialize (у нього своя ініціалізація), тож
+            // реєстр треба заповнити вручну - інакше перки авторемонту стіну
+            // просто не бачать. IsReady тут НЕ чіпаємо: стіна стає активною
+            // пізніше, коли їй задано вузли (SetNodes).
+            RegisterInRegistry();
         }
 
         private void OnHealthChanged(float currentHP)

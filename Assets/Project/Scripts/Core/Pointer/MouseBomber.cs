@@ -11,6 +11,9 @@ public class MouseBomber : MonoBehaviour
 
     [SerializeField] private Explosion _explosionPrefab;
 
+    /// <summary>Префаб вибуху, щоб перк "німцеріз" бахкав так само, як клік мишкою.</summary>
+    public Explosion ExplosionPrefab => _explosionPrefab;
+
     [Header("Range Indicator")]
     [SerializeField] private RangeCircle _rangeCircle;
     [SerializeField] private Color _rangeColor = Color.cyan;

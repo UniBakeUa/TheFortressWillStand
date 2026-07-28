@@ -11,6 +11,7 @@ namespace Managers
         [SerializeField] private TextMeshProUGUI _waveLevelText;
         [SerializeField] private WaveTimerView _waveTimerView;
         [SerializeField] private SpawnerManager _spawnerManager;
+        [SerializeField] private PerkSelectionController _perkSelectionController;
         [SerializeField] WaterGrid waterGrid;
         [SerializeField] float delayBetweenWaves = 2.0f;
         [SerializeField] float delayBetweenStages = 10.0f;
@@ -46,6 +47,12 @@ namespace Managers
             }
             else
             {
+                // PerkSelection - це пауза ВСЕРЕДИНІ циклу хвиль: саме
+                // WaveProgressionRoutine чекає на завершення вибору картки.
+                // Зупинити її тут означало б убити корутину, яка й має продовжити
+                // раунд після вибору, і гра зависла б на панелі прокачки.
+                if (newState == GameState.PerkSelection) return;
+
                 // Якщо ми в Building або Paused - зупиняємо хвилі
                 if (_waveCoroutine != null)
                 {
@@ -103,15 +110,38 @@ namespace Managers
                 // Після завершення всіх хвиль стадії, спавнер зупиняє роботу і доки всі вороги не будуть знищені стан не зміниться на Building
 
                 yield return new WaitUntil(() => _spawnerManager.CheckIsAllDead() == true);
+
+                // 5. Кінець раунду: таймер на паузу, і спершу - вибір прокачки.
+                _waveTimerView.HideTimer();
+                yield return PerkSelectionRoutine();
+
                 Debug.Log("go to building");
 
-                // 5. Завершення стадії - перехід в Building
+                // 6. Після вибору картки - перехід в Building
                 GameStateManager.Instance.ChangeState(GameState.Building);
-                _waveTimerView.HideTimer();
 
                 // Чекаємо, поки гравець завершить будівництво
                 yield return new WaitUntil(() => GameStateManager.Instance.CurrentState == GameState.Playing);
             }
+        }
+
+        /// <summary>
+        /// Тримає корутину хвиль, поки гравець вибирає картку прокачки.
+        /// Якщо контролера на сцені немає - просто пропускає крок.
+        /// </summary>
+        IEnumerator PerkSelectionRoutine()
+        {
+            if (_perkSelectionController == null) yield break;
+
+            bool isFinished = false;
+            System.Action onFinished = () => isFinished = true;
+
+            _perkSelectionController.OnSelectionFinished += onFinished;
+            _perkSelectionController.BeginSelection();
+
+            yield return new WaitUntil(() => isFinished);
+
+            _perkSelectionController.OnSelectionFinished -= onFinished;
         }
 
         // Логіка спавну залишається такою ж, як в попередньому прикладі

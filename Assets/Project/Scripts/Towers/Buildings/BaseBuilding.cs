@@ -18,6 +18,23 @@ namespace Towers.Buildings
 
         public bool IsSlipable => _isSlipable;
         public BuildingModel Model { get; protected set; }
+
+        // Усі живі будівлі. Перки авторемонту і бафи турелей ходять сюди замість
+        // FindObjectsOfType щокадру. Реєстрація в Initialize, зняття - в Collapse
+        // і OnDestroy (будівля може зникнути і не через Collapse).
+        private static readonly List<BaseBuilding> _allBuildings = new();
+
+        /// <summary>Усі збудовані будівлі, включно з фортецею.</summary>
+        public static IReadOnlyList<BaseBuilding> AllBuildings => _allBuildings;
+
+        /// <summary>
+        /// Чи це фортеця. Перки авторемонту розділені: один лагодить фортецю,
+        /// інший - усе решта, тож їм треба відрізняти одне від одного.
+        /// </summary>
+        public virtual bool IsFortress => false;
+
+        /// <summary>Будівля пошкоджена і її є сенс лагодити.</summary>
+        public bool NeedsRepair => Model != null && Model.CurrentHP > 0f && Model.CurrentHP < Model.MaxHP;
         public float ExposureFraction { get; private set; }
         public bool IsReady { get; protected set; }
         protected virtual float ErosionRate => Model.BaseErosionRate;
@@ -55,6 +72,7 @@ namespace Towers.Buildings
             }
 
             IsReady = true;
+            RegisterInRegistry();
             RegisterFootprint();
             PlaySpawnAnimation();
 
@@ -106,8 +124,20 @@ namespace Towers.Buildings
             if (Model.CurrentHP <= 0f) Collapse();
         }
 
+        /// <summary>
+        /// Ставить будівлю в глобальний реєстр. Fortress перевизначає Initialize
+        /// без виклику base, тож кличе цей метод сам.
+        /// </summary>
+        protected void RegisterInRegistry()
+        {
+            if (!_allBuildings.Contains(this))
+                _allBuildings.Add(this);
+        }
+
         public virtual void Collapse()
         {
+            _allBuildings.Remove(this);
+
             if (WaterGrid != null)
                 WaterGrid.UnregisterObstacle(transform.position, _registeredRadius);
 
@@ -137,11 +167,41 @@ namespace Towers.Buildings
 
         public void Repair(float amount)
         {
-             Model.CurrentHP = Mathf.Min(Model.MaxHP, Model.CurrentHP + amount);
+            if (Model == null || amount <= 0f) return;
+
+            float before = Model.CurrentHP;
+            Model.CurrentHP = Mathf.Min(Model.MaxHP, Model.CurrentHP + amount);
+
+            // Спалах лише коли HP реально зросло: авторемонт цокає щосекунди і
+            // б'є в тому числі по цілих будівлях, а блимати ними не треба.
+            if (Model.CurrentHP > before)
+                PlayRepairFlash();
         }
+
+        /// <summary>Зелений спалах спрайтів. Компонент необов'язковий.</summary>
+        protected void PlayRepairFlash()
+        {
+            if (!_repairFlashCached)
+            {
+                _repairFlash = GetComponent<RepairFlash>();
+                _repairFlashCached = true;
+            }
+
+            if (_repairFlash != null)
+                _repairFlash.Play();
+        }
+
+        // Кешуємо і сам компонент, і факт пошуку: без прапорця GetComponent
+        // викликався б щоразу на будівлях, де RepairFlash не висить.
+        private RepairFlash _repairFlash;
+        private bool _repairFlashCached;
 
         protected virtual void OnDestroy()
         {
+            // Не тільки для Collapse: будівля може зникнути разом зі сценою або
+            // через Destroy ззовні, а мертвий запис у статичному списку лишиться.
+            _allBuildings.Remove(this);
+
             if (WaterGrid != null)
                 WaterGrid.OnGridRebuilt -= OnGridRebuilt;
         }
