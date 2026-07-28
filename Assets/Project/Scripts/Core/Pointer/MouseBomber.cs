@@ -61,6 +61,7 @@ public class MouseBomber : MonoBehaviour
         {
             if (e.transform.TryGetComponent(out Items.Enemy enemy))
             {
+                // Б'ємо ніби згори - напрямку розльоту немає, лишається клякса
                 enemy.WasStricken();
             }
         }

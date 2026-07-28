@@ -81,6 +81,14 @@ namespace Managers
 
             InitBuildZone();
             _waterGrid.RebuildWaterGrid(_areaConfig.GridWidth, _areaConfig.GridHeight, 0.125f, _areaConfig.GridOrigin);
+
+            // Шари крові й мокрості прив'язані до піску, який щойно змінив
+            // розмір/позицію
+            if (BloodDecalSystem.Instance != null)
+                BloodDecalSystem.Instance.RebuildArea();
+
+            if (SandWetnessSystem.Instance != null)
+                SandWetnessSystem.Instance.RebuildArea();
         }
 
         // Повертає індекс конфігурації з найбільшим RequiredWave, що не перевищує completedWaves.

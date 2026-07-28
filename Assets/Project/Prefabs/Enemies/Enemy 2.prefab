@@ -128,12 +128,8 @@ MonoBehaviour:
   firstAttackDelay: 2
   crashGravity: 3
   crashRotation: 350
-  falling: {fileID: 8300000, guid: b0d08f9994a8aa7418a969b0825840c5, type: 3}
-  shotSound: {fileID: 8300000, guid: 8346c142b212f384fa3b6dbf70b5da37, type: 3}
-  explosionSound: {fileID: 8300000, guid: 08677f21ec19b8949be6de51e46a3b0e, type: 3}
-  voiceLines:
-  - {fileID: 8300000, guid: b440a9d704d5d8e47857a9558d544835, type: 3}
-  - {fileID: 8300000, guid: 6f51839fbe748e74897d3590cd959cbe, type: 3}
+  _leavesBloodTrail: 1
+  _bloodSplatScale: 1
   _explosionPrefab: {fileID: 5717577051735948075, guid: 4bc825b1ec021e744981813233d0aad4, type: 3}
   _grenadePrefab: {fileID: 2876441665723923219, guid: 86c6635e766ff5e468590db7f1d72db1, type: 3}
   _animator: {fileID: 2993999695330708399}
@@ -147,6 +143,7 @@ MonoBehaviour:
   _waypointReachDistance: 0.3
   _approachDistanceJitter: 0.3
   _preferWallBreakChance: 0.5
+  _attackVisibilityMargin: 0.05
   _debugDrawNavigation: 1
 --- !u!1001 &4795057197929171378
 PrefabInstance:
@@ -160,6 +157,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: -6988019182269935092, guid: 0e44aa64b1fd96542857b4469920f9a6, type: 3}
+    - target: {fileID: 1782379341978721908, guid: 610dfae746178a441829b930e06ca873, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 56db43442d38228479bf0335ead8d800, type: 2}
     - target: {fileID: 2028633735694201068, guid: 610dfae746178a441829b930e06ca873, type: 3}
       propertyPath: m_Name
       value: HumanoidEnemy
@@ -168,6 +169,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: -6988019182269935092, guid: f35ea3fe1fbcf844b85da20be902f6f5, type: 3}
+    - target: {fileID: 3213183565799425514, guid: 610dfae746178a441829b930e06ca873, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 56db43442d38228479bf0335ead8d800, type: 2}
     - target: {fileID: 4629680319949738387, guid: 610dfae746178a441829b930e06ca873, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -212,6 +217,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: -6988019182269935092, guid: 668a7b77617bb90428ff161eac8bfb6d, type: 3}
+    - target: {fileID: 6804816664292898622, guid: 610dfae746178a441829b930e06ca873, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 56db43442d38228479bf0335ead8d800, type: 2}
     - target: {fileID: 8156113659209163281, guid: 610dfae746178a441829b930e06ca873, type: 3}
       propertyPath: m_IsActive
       value: 1

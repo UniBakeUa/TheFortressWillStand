@@ -116,10 +116,10 @@ TextureImporter:
       name: towerDefense_tile246_0
       rect:
         serializedVersion: 2
-        x: 17
-        y: 4
-        width: 72
-        height: 89
+        x: 13
+        y: 0
+        width: 78
+        height: 95
       alignment: 9
       pivot: {x: 0.6633486, y: 0.6721177}
       border: {x: 0, y: 0, z: 0, w: 0}

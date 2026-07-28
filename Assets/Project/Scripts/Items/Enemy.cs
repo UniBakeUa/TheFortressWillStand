@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Towers;
 using Towers.Buildings;
+using Waves;
 
 namespace Items
 {
@@ -33,6 +34,12 @@ namespace Items
         private bool isDead;
         private bool isReachTower;
         private bool isGrenadeInFlight;
+
+        [Header("Blood")]
+        [Tooltip("Чи лишає цей ворог кровавий слід після смерті. Вимкнути для не-гуманоїдів (техніка, літаки тощо)")]
+        [SerializeField] private bool _leavesBloodTrail = true;
+        [Tooltip("Множник розміру плями - більші вороги лишають більше крові")]
+        [SerializeField] private float _bloodSplatScale = 1f;
 
         [Header("Explosion")]
         [SerializeField] private GameObject _explosionPrefab;
@@ -77,6 +84,7 @@ namespace Items
             isReachTower = false;
             hasAttackedOnce = false;
             timeSinceLastAttack = 0f;
+            _lastHitSource = null;
 
             _currentPath = null;
             _currentWaypointIndex = 0;
@@ -430,6 +438,7 @@ namespace Items
         protected override void Collect()
         {
             PlayFallingAudio();
+            SpawnBloodSplat();
 
             base.Collect();
             //MoneyManager.Instance.AddMoney(moneyValue);
@@ -455,13 +464,42 @@ namespace Items
             }
         }
 
-        public void WasStricken()
+        /// <param name="hitSourcePosition">
+        /// Звідки прилетів удар. Кров розлітається за вектором від цієї точки
+        /// до ворога. null = удар згори (постріл мишкою), тоді кров лишає
+        /// симетричну кляксу без напрямку.
+        /// </param>
+        public void WasStricken(Vector2? hitSourcePosition = null)
         {
             if (isDead) return;
 
             isDead = true;
+            _lastHitSource = hitSourcePosition;
 
             Collect();
+        }
+
+        // Джерело удару, що вбив ворога. null = удар був згори і напрямку
+        // розльоту не має (клік мишкою, або смерть не від пострілу взагалі).
+        private Vector2? _lastHitSource;
+
+        private void SpawnBloodSplat()
+        {
+            if (!_leavesBloodTrail) return;
+            if (BloodDecalSystem.Instance == null) return;
+
+            Vector2 myPos = transform.position;
+
+            if (!_lastHitSource.HasValue)
+            {
+                // Стріляли ніби згори - кров розбризкується рівномірно навколо
+                BloodDecalSystem.Instance.PaintBlob(myPos, _bloodSplatScale);
+                return;
+            }
+
+            // Кров летить далі в тому ж напрямку, у якому рухався снаряд:
+            // від джерела пострілу крізь ворога.
+            BloodDecalSystem.Instance.PaintSplat(myPos, myPos - _lastHitSource.Value, _bloodSplatScale);
         }
 
         private void PlayFallingAudio()

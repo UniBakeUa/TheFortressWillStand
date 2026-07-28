@@ -116,12 +116,12 @@ TextureImporter:
       name: towerDefense_tile247_0
       rect:
         serializedVersion: 2
-        x: 39
-        y: 35
-        width: 50
-        height: 58
+        x: 36
+        y: 32
+        width: 56
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 492f1762111751e43a02bb2f7adff15a
     internalID: 0
     vertices: []
     indices: 

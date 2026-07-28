@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 8.57, y: 6.63, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5574829217463662420}
@@ -122,19 +122,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moneyValue: 15
-  speed: 0.23
+  speed: 1
   AttackDistance: 4
   damage: 15
   attackDelay: 10
   firstAttackDelay: 2
   crashGravity: 3
   crashRotation: 350
-  falling: {fileID: 8300000, guid: b0d08f9994a8aa7418a969b0825840c5, type: 3}
-  shotSound: {fileID: 8300000, guid: 8346c142b212f384fa3b6dbf70b5da37, type: 3}
-  explosionSound: {fileID: 8300000, guid: 08677f21ec19b8949be6de51e46a3b0e, type: 3}
-  voiceLines:
-  - {fileID: 8300000, guid: b440a9d704d5d8e47857a9558d544835, type: 3}
-  - {fileID: 8300000, guid: 6f51839fbe748e74897d3590cd959cbe, type: 3}
+  _leavesBloodTrail: 1
+  _bloodSplatScale: 1
   _explosionPrefab: {fileID: 5717577051735948075, guid: 4bc825b1ec021e744981813233d0aad4, type: 3}
   _grenadePrefab: {fileID: 2876441665723923219, guid: 86c6635e766ff5e468590db7f1d72db1, type: 3}
   _animator: {fileID: 0}
@@ -147,6 +143,8 @@ MonoBehaviour:
   _maxDetourMultiplier: 1.5
   _waypointReachDistance: 0.3
   _approachDistanceJitter: 0.3
+  _preferWallBreakChance: 0.5
+  _attackVisibilityMargin: 0.05
   _debugDrawNavigation: 0
 --- !u!1 &4387624909449761327
 GameObject:

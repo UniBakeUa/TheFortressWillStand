@@ -72,12 +72,18 @@ namespace Towers.Buildings
 
         private void SplashDamage(Vector3 center)
         {
+            // Кров має розлітатись від вежі "крізь" ворога, тож джерелом удару
+            // передаємо позицію дула (для тих, кого зачепило сплешем - центр
+            // вибуху, бо їх відкидає саме від нього).
+            Vector2 shotOrigin = _muzzle != null ? (Vector2)_muzzle.position : (Vector2)transform.position;
+
             Collider2D[] hits = Physics2D.OverlapCircleAll(center, TurretModel.SplashRadius, _targetLayerMask);
             foreach (var hit in hits)
             {
                 if (hit.TryGetComponent(out Enemy enemy))
                 {
-                    enemy.WasStricken();
+                    bool isDirectHit = ((Vector2)enemy.transform.position - (Vector2)center).sqrMagnitude < 0.04f;
+                    enemy.WasStricken(isDirectHit ? shotOrigin : (Vector2)center);
                 }
             }
         }

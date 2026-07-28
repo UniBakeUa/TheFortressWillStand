@@ -19,7 +19,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties: _FoamBubbleStrength
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -41,25 +41,48 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _CausticScale: 11
+    - _CausticSpeed: 0.5
+    - _CausticStrength: 0.35
     - _CrestNoiseScale: 2.5
-    - _CrestStrength: 0.445
-    - _CrestThreshold: 0.91
+    - _CrestStrength: 0.311
+    - _CrestThreshold: 0.74
     - _DeepPower: 1.2
     - _DepthColorDistance: 0.21
+    - _EdgeAlphaFade: 0.12
     - _EnableExternalAlpha: 0
     - _FlowSpeed: 0.35
-    - _FoamNoiseScale: 6
-    - _FoamNoiseSpeed: 0.8
-    - _FoamThreshold: 0.811
-    - _FoamWidth: 0.15
+    - _FoamBubbleScale: 28
+    - _FoamBubbleStrength: 0.524
+    - _FoamNoiseScale: 6.85
+    - _FoamNoiseSpeed: 1.21
+    - _FoamSoftness: 0.351
+    - _FoamStretch: 3
+    - _FoamThreshold: 0.835
+    - _FoamWidth: 0.49
+    - _GridEdgeFade: 0.28
+    - _ShorelineFade: 0.18
     - _ShorelineOffset: 0.01
+    - _SparkleScale: 7.6
+    - _SparkleSpeed: 1.4
+    - _SparkleStrength: 0.5
+    - _SparkleThreshold: 0.819
+    - _SurfFoamBoost: 0.9
+    - _SurfPeriod: 3.4
+    - _SurfReach: 0.55
+    - _SurfSecondary: 0.45
+    - _SurfSkew: 0.35
+    - _SurfStrength: 0.5
+    - _SurfWaveLength: 7
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DeepColor: {r: 0.20465466, g: 0.515719, b: 0.5943396, a: 0.95}
+    - _DeepColor: {r: 0.20392154, g: 0.5754705, b: 0.59607846, a: 0.74509805}
     - _FlowDirection: {r: 0.29, g: 0, b: 0, a: 0}
     - _FoamColor: {r: 0.4494482, g: 0.8805284, b: 0.9433962, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
-    - _ShallowColor: {r: 0.24363652, g: 0.60107243, b: 0.6886792, a: 0.55}
+    - _ShallowColor: {r: 0.229085, g: 0.6336072, b: 0.735849, a: 0.55}
+    - _ShorelineTint: {r: 0.45, g: 0.41999996, b: 0.29999998, a: 1}
+    - _SparkleColor: {r: 1, g: 1, b: 0.95, a: 0.5882353}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
